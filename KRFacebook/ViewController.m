@@ -1,19 +1,44 @@
-## Supports
+//
+//  ViewController.m
+//  KRFacebook
+//
+//  Created by Kalvar on 12/10/15.
+//  Copyright (c) 2012年 Kuo-Ming Lin. All rights reserved.
+//
 
-KRFacebook integrates Facebook 3.0, it also supports MRC ( Manual Reference Counting ). But it still have no support Graph API and all of New 3.x APIs. We'll try to integrate it as soon as possible. If you did want it support to ARC, that just use Xode tool to auto convert to ARC. ( Xcode > Edit > Refactor > Convert to Objective-C ARC )
+#import "ViewController.h"
 
-## How To Get Started
+@interface ViewController ()
 
-To import "KRFacebook.h".
+@end
 
-``` objective-c
-@property (nonatomic, retain) KRFacebook *facebook;
+@implementation ViewController
+
+@synthesize facebook;
 
 - (void)viewDidLoad
 {
     facebook = [[KRFacebook alloc] initWithDelegate:self];
     //facebook = [[KRFacebook alloc] initWithDevKey:@"Your Developer Key of Facebook App" delegate:self];
     [super viewDidLoad];
+	// Do any additional setup after loading the view, typically from a nib.
+}
+
+-(void)viewDidAppear:(BOOL)animated{
+//    [facebook logout];
+//    [facebook login];
+    [super viewDidAppear:animated];
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+-(void)dealloc{
+    [facebook release];
+    [super dealloc];
 }
 
 #pragma IBActions
@@ -44,12 +69,28 @@ To import "KRFacebook.h".
 -(IBAction)logout:(id)sender{
     [self.facebook logout];
 }
-```
 
-## Version
+#pragma KRFacebookDelegate
+-(void)krFacebookDidLogin{
+    //NSLog(@"krFacebookDidLogin");
+}
 
-KRFacebook now is V0.9 Beta.
+-(void)krFacebookDidLogout{
+    //NSLog(@"krFacebookDidLogout");
+}
 
-## License
+-(void)krFacebookDidCancel{
+    //NSLog(@"krFacebookDidCancel");
+}
 
-KRFacebook is available under the MIT license ( or Whatever you wanna do ). See the LICENSE file for more info.
+-(void)krFacebookDidFinishAllRequests{
+    //NSLog(@"krFacebookDidFinishAllRequests");
+    
+}
+
+-(void)krFacebook:(KRFacebook *)_krFacebook didSavedUserPrivations:(NSDictionary *)_savedDatas{
+    //NSLog(@"datas : %@", _savedDatas);
+}
+
+
+@end
