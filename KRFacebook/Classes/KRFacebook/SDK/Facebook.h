@@ -61,6 +61,8 @@
 @property(nonatomic, copy) NSString* urlSchemeSuffix;
 @property(nonatomic, readonly) BOOL isFrictionlessRequestsEnabled;
 @property(nonatomic, readonly, retain) FBSession *session;
+//
+@property(nonatomic, assign) BOOL toUpdateSession;
 
 - (id)initWithAppId:(NSString *)appId
         andDelegate:(id<FBSessionDelegate>)delegate;

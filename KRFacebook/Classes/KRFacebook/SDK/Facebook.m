@@ -71,6 +71,7 @@ static NSString *const FBexpirationDatePropertyName = @"expirationDate";
             session = _session,
             hasUpdatedAccessToken = _hasUpdatedAccessToken,
             tokenCaching = _tokenCaching;
+@synthesize toUpdateSession;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // private
@@ -120,7 +121,7 @@ static NSString *const FBexpirationDatePropertyName = @"expirationDate";
         self.appId = appId;
         self.sessionDelegate = delegate;
         self.urlSchemeSuffix = urlSchemeSuffix;
-        
+        self.toUpdateSession = YES;
         // observe tokenCaching properties so we can forward KVO
         [self.tokenCaching addObserver:self 
                             forKeyPath:FBaccessTokenPropertyName
@@ -245,27 +246,45 @@ static NSString *const FBexpirationDatePropertyName = @"expirationDate";
 
 - (void)updateSessionIfTokenUpdated {
     /*
-     * 註解這裡，以避免發生重覆「驗證與登入」的情況，
-     * 如果這裡沒註解，就會在進行「任何 Facebook Request 請求」時，發生跳出 App 開啟 Safari 進行重複驗證的問題 !
+     * @ 這裡有個狀況 ( 2012/10/01 ):
+     *
+     *      - 原本要註解這裡，以避免發生重覆「驗證與登入」的情況，
+     *        因為這裡沒註解，就會在進行「任何 Facebook Request 請求」時，發生跳出 App 開啟 Safari 進行重複驗證的問題。
+     *
+     * @ 這情況發生在 :
+     *
+     *      - 原因出在，如果為「第一次」登入 ( 沒有 accessToken, offline_access ) 的情況下，
+     *        Facebook SDK 就會在登入後，因為有設定了 self.accessToken 的關係，而讓 self.hasUpdatedAccessToken 變為 YES，
+     *        之後，[Facebook updateSessionIfTokenUpdated] 就會被執行，
+     *        此時，就會再一次自動跳出 App 外，以 Safari 要求再次進行登入與授權的動作，
+     *        所以，如果在使用 Facebook SDK 3.x 時，是強制改回以 In-App 的 WebView 登入方式在進行登入的話，
+     *        就會發生上述情形。最簡單的方法，是把 updateSessionIfTokenUpdated 函式註解，直接不執行，
+     *        但這就發生每次要請求 API ( 例如 PO 文 ) 時，都必須在「當下要先重新登入過」，才能執行請求，
+     *        否則，就會因為 FBSession 沒有更新與啟動，而收到 Facebook 回應 Error: HTTP status code: 400 的問題，
+     *        接著，就會操作無效了。簡單講，這一切都是流程不同於 SDK 2.0 的關係，所以如果硬要 Hack 它，就會出點鎚。
+     *
+     * @ 解決方法 ( 2013/01/07 ) :
+     *
+     *      - 修改官方 Source Code，加入一個 BOOL toUpdateSession 的判斷布林值，並在使用 [Facebook authorize:] 方法登入 Facebook 前，
+     *        將 toUpdateSession 設為 NO，而在進行其他的 API Request 時，則都設為 YES，
+     *        最後，再去修改 [Facebook updateSessionIfTokenUpdated] 函式裡的 IF 判斷式，
+     *        將其改成 if (self.hasUpdatedAccessToken && self.toUpdateSession){ ... } 即可。
+     *
      */
-    /*
-    if (self.hasUpdatedAccessToken) {
+    if (self.hasUpdatedAccessToken && self.toUpdateSession) {
         self.hasUpdatedAccessToken = NO;
-
         // invalidate current session and create a new one with the same permissions
         NSArray *permissions = self.session.permissions;
-        [self.session close];    
+        [self.session close];
         self.session = [[[FBSession alloc] initWithAppID:_appId
                                              permissions:permissions
                                          urlSchemeSuffix:_urlSchemeSuffix
                                       tokenCacheStrategy:self.tokenCaching]
-                           autorelease];
-    
+                        autorelease];
+        
         // get the session into a valid state
         [self.session openWithCompletionHandler:nil];
     }
-     */
-    
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -305,7 +324,9 @@ static NSString *const FBexpirationDatePropertyName = @"expirationDate";
     [self.session close];
     self.session = nil;
     [self.tokenCaching clearToken];
-    
+    //
+    self.toUpdateSession = NO;
+    //
     self.session = [[[FBSession alloc] initWithAppID:_appId
                                          permissions:permissions
                                      urlSchemeSuffix:_urlSchemeSuffix

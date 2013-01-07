@@ -268,6 +268,16 @@ typedef enum _KRFacebookProcess{
  */
 -(void)clearDelegates;
 
+/*
+ * @取得 Token
+ */
+-(NSString *)getToken;
+
+/*
+ * @取得已儲存的個人資料
+ */
+-(NSDictionary *)getSavedDatas;
+
 @end
 
 

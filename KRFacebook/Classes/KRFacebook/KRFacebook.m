@@ -47,6 +47,8 @@
 
 -(NSString *)_getSavedString:(NSString *)_nsdefaultKey;
 
+-(NSDictionary *)_getSavedDatas;
+
 -(void)_savingPrivateInformationOfUserInApp:(NSDictionary *)_responses;
 
 -(NSDictionary *)_setupParamsWithUploadImageUrl:(id)_imageUrl 
@@ -105,6 +107,17 @@
     return [NSString stringWithFormat:@"%@", [[NSUserDefaults standardUserDefaults] objectForKey:_nsdefaultKey]];
 }
 
+//製作已儲存在 App 裡的資料陣列 ( 存至 Server 使用 )
+-(NSDictionary *)_getSavedDatas{
+    return [NSDictionary dictionaryWithObjectsAndKeys:
+            [self _getSavedString:FACEBOOK_ACCESS_TOKEN_KEY],    FACEBOOK_ACCESS_TOKEN_KEY,
+            [self _getSavedString:FACEBOOK_EXPIRATION_DATE_KEY], FACEBOOK_EXPIRATION_DATE_KEY,
+            [self _getSavedString:FACEBOOK_USER_ACCOUNT_KEY],    FACEBOOK_USER_ACCOUNT_KEY,
+            [self _getSavedString:FACEBOOK_USER_ID_KEY],         FACEBOOK_USER_ID_KEY,
+            [self _getSavedString:FACEBOOK_USER_NAME_KEY],       FACEBOOK_USER_NAME_KEY,
+            nil];
+}
+
 /*
  * 匯整與儲存 User 的私人資訊在 App 裡，並同時觸發委派進行儲存至 Server 的資料互動
  */
@@ -113,16 +126,8 @@
     [[NSUserDefaults standardUserDefaults] setObject:[_responses objectForKey:@"id"] forKey:FACEBOOK_USER_ID_KEY];
     [[NSUserDefaults standardUserDefaults] setObject:[_responses objectForKey:@"name"] forKey:FACEBOOK_USER_NAME_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize]; 
-    NSDictionary *savedDatas   = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  [self _getSavedString:FACEBOOK_ACCESS_TOKEN_KEY],    FACEBOOK_ACCESS_TOKEN_KEY,
-                                  [self _getSavedString:FACEBOOK_EXPIRATION_DATE_KEY], FACEBOOK_EXPIRATION_DATE_KEY,
-                                  [self _getSavedString:FACEBOOK_USER_ACCOUNT_KEY],    FACEBOOK_USER_ACCOUNT_KEY,
-                                  [self _getSavedString:FACEBOOK_USER_ID_KEY],         FACEBOOK_USER_ID_KEY,
-                                  [self _getSavedString:FACEBOOK_USER_NAME_KEY],       FACEBOOK_USER_NAME_KEY,
-                                  nil];
-    
     if( [self.delegate respondsToSelector:@selector(krFacebook:didSavedUserPrivations:)] ){
-        [self.delegate krFacebook:self didSavedUserPrivations:savedDatas];
+        [self.delegate krFacebook:self didSavedUserPrivations:[self _getSavedDatas]];
     }
     
 }
@@ -698,7 +703,7 @@
  *   如果沒有連網路，會無法出現 Facebook 的登入畫面
  */
 -(void)loginWithPermissions:(NSArray *)permissions{
-    //讀出之前儲存的 Access Token / Expiration Date ( 時效至 4001/1/1 )
+    //讀出之前儲存的 Access Token / Expiration Date ( 時效從 2013 年開始，官方改成只有 2 個月保存期 )
     if( !self.isLogged ){
         self.isLogged = [self alreadyLogged];
     }
@@ -706,11 +711,12 @@
         if( [permissions count] > 0 ){
             self.fbPermissons = permissions;
         }
-        [facebook authorize:self.fbPermissons]; 
+        facebook.toUpdateSession = NO;
+        [facebook authorize:self.fbPermissons];
     }else{
+        facebook.toUpdateSession = YES;
         [self fbDidLogin];
     }
-    
 }
 
 /*
@@ -800,6 +806,20 @@
 -(void)clearDelegates{
     self.delegate = nil;
     self.facebook.sessionDelegate = nil;
+}
+
+/*
+ * @取得 Token
+ */
+-(NSString *)getToken{
+    return [[[NSUserDefaults standardUserDefaults] objectForKey:FACEBOOK_ACCESS_TOKEN_KEY] stringValue];
+}
+
+/*
+ * @取得已儲存的個人資料
+ */
+-(NSDictionary *)getSavedDatas{
+    return [self _getSavedDatas];
 }
 
 #pragma FacebookDelegate
