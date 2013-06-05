@@ -1,12 +1,13 @@
 //
 //  KRFacebook.m
 //  
-//  Created by Kuo-Ming Lin ( Kalvar ; ilovekalvar@gmail.com ) on 2012/10/20.
-//  Copyright (c) 2012年 Kuo-Ming Lin. All rights reserved.
+//  Created by Kuo-Ming Lin ( Kalvar ; ilovekalvar@gmail.com ) on 2013/01/20.
+//  Copyright (c) 2013年 Kuo-Ming Lin. All rights reserved.
 //
 
 /*
  * @self.executing 參數說明 (後續會再增加) :
+ *
  *  init                    : 初始化
  *  upload.media            : 上傳影音
  *  post.feeds.word         : 發佈純文字留言
@@ -30,12 +31,15 @@
  */
 
 #import "KRFacebook.h"
+#import "AppDelegate.h"
 
-@interface KRFacebook (){
-    Facebook *facebook;
+@interface KRFacebook ()
+{
+    __strong Facebook *facebook;
+    
 }
 
-@property (readonly) Facebook *facebook;
+@property (strong, readonly) Facebook *facebook;
 @property (nonatomic, assign) BOOL isString;
 
 @end
@@ -70,6 +74,9 @@
 
 -(void)_uploadWithMediaConfigs:(NSDictionary *)_mediaConfigs;
 
+//
+-(void)_requestDidLoadResult:(id)result;
+-(void)_requestDidFailWithError:(NSError *)error;
 
 @end
 
@@ -95,20 +102,28 @@
                          @"email",
                          @"user_photos",
                          @"user_events",
-                         @"friends_photos",
+                         @"user_checkins",
                          nil];     
     self.executing     = @"init";
     self.processing    = KRFacebookProcessForNothing;
-    facebook           = [[Facebook alloc] initWithAppId:self.devKey andDelegate:self];
+    facebook           = nil; //[[Facebook alloc] initWithAppId:self.devKey andDelegate:self];
     jsonWriter         = [[FBSBJSON alloc] init];
+    //
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    if (!appDelegate.session.isOpen) {
+        appDelegate.session = [[FBSession alloc] initWithPermissions:self.fbPermissons];
+    }
+    fbSession = appDelegate.session;
+    
 }
 
--(NSString *)_getSavedString:(NSString *)_nsdefaultKey{
+-(NSString *)_getSavedString:(NSString *)_nsdefaultKey
+{
     return [NSString stringWithFormat:@"%@", [[NSUserDefaults standardUserDefaults] objectForKey:_nsdefaultKey]];
 }
 
-//製作已儲存在 App 裡的資料陣列 ( 存至 Server 使用 )
--(NSDictionary *)_getSavedDatas{
+-(NSDictionary *)_getSavedDatas
+{
     return [NSDictionary dictionaryWithObjectsAndKeys:
             [self _getSavedString:FACEBOOK_ACCESS_TOKEN_KEY],    FACEBOOK_ACCESS_TOKEN_KEY,
             [self _getSavedString:FACEBOOK_EXPIRATION_DATE_KEY], FACEBOOK_EXPIRATION_DATE_KEY,
@@ -121,7 +136,9 @@
 /*
  * 匯整與儲存 User 的私人資訊在 App 裡，並同時觸發委派進行儲存至 Server 的資料互動
  */
--(void)_savingPrivateInformationOfUserInApp:(NSDictionary *)_responses{
+-(void)_savingPrivateInformationOfUserInApp:(NSDictionary *)_responses
+{
+    //NSLog(@"_savingPrivateInformationOfUserInApp : %@", _responses);
     [[NSUserDefaults standardUserDefaults] setObject:[_responses objectForKey:@"email"] forKey:FACEBOOK_USER_ACCOUNT_KEY];
     [[NSUserDefaults standardUserDefaults] setObject:[_responses objectForKey:@"id"] forKey:FACEBOOK_USER_ID_KEY];
     [[NSUserDefaults standardUserDefaults] setObject:[_responses objectForKey:@"name"] forKey:FACEBOOK_USER_NAME_KEY];
@@ -149,7 +166,6 @@
 								   image, @"picture",
                                    _description, @"caption",
 								   nil];
-    [image release];
     return params;
 }
 
@@ -235,11 +251,70 @@
     self.executing  = @"upload.media";
     self.processing = KRFacebookProcessForUploadMedia;
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:_mediaConfigs];
-    [facebook requestWithGraphPath:@"me/videos"
-                         andParams:params 
-                     andHttpMethod:@"POST"
-                       andDelegate:self];
+//    [facebook requestWithGraphPath:@"me/videos"
+//                         andParams:params 
+//                     andHttpMethod:@"POST"
+//                       andDelegate:self];
+    
+    
+    FBRequest *_fbRequest = [[FBRequest alloc] initWithSession:self.fbSession
+                                                     graphPath:@"me/videos"
+                                                    parameters:params
+                                                    HTTPMethod:@"POST"];
+    
+    [_fbRequest startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self _requestDidLoadResult:result];
+    }];
+    
 }
+
+#pragma 
+/*
+ * @ 原來的 FBRequestDelegate + FBSessionDelegate 搬到這裡變成自函式
+ */
+//原先是 request:(FBRequest *)request didLoad:(id)result
+-(void)_requestDidLoadResult:(id)result{
+	if ( [result isKindOfClass:[NSArray class]] ) {
+		result = [result objectAtIndex:0];
+	}
+    
+    if( [result isKindOfClass:[NSData class]] ){
+        NSString *_tempResult = [[NSString alloc] initWithData:(NSData *)result encoding:NSUTF8StringEncoding];
+        result = [NSString stringWithString:_tempResult];
+    }
+    
+    self.isString = [result isKindOfClass:[NSString class]] ? YES : NO;
+    
+    if( [self.delegate respondsToSelector:@selector(krFacebook:didLoadWithResponses:andKindOf:)] ){
+        [self.delegate krFacebook:self didLoadWithResponses:result andKindOf:self.executing];
+    }
+    
+    if( self.isString && [self.delegate respondsToSelector:@selector(krFacebook:didLoadWithResponseOfString:andKindOf:)] ){
+        [self.delegate krFacebook:self didLoadWithResponseOfString:result andKindOf:self.executing];
+    }else{
+        if( self.saveUser ){
+            self.saveUser = NO;
+            [self _savingPrivateInformationOfUserInApp:result];
+        }
+        if( [result isKindOfClass:[NSDictionary class]] &&
+           [self.delegate respondsToSelector:@selector(krFacebook:didLoadWithResponsesOfDictionary:andKindOf:)]){
+            [self.delegate krFacebook:self didLoadWithResponsesOfDictionary:result andKindOf:self.executing];
+        }
+    }
+    
+    if( [self.delegate respondsToSelector:@selector(krFacebookDidFinishAllRequests)] ){
+        [self.delegate krFacebookDidFinishAllRequests];
+    }
+    //NSLog(@"fbRequest didLoad (FinishAllRequests)");
+}
+
+//原先是 request:(FBRequest *)request didFailWithError:(NSError *)error
+-(void)_requestDidFailWithError:(NSError *)error{
+    if( [self.delegate respondsToSelector:@selector(krFacebook:didFailWithResponses:andKindOf:)] ){
+        [self.delegate krFacebook:self didFailWithResponses:error andKindOf:self.executing];
+    }
+}
+
 
 @end
 
@@ -255,9 +330,23 @@
             saveUser,
             fbPermissons;
 @synthesize processing;
+//
+@synthesize fbSession;
 
 #pragma Construct
--(KRFacebook *)initWithDelegate:(id<KRFacebookDelegate>)_sdkDelegate{
++(KRFacebook *)sharedManager
+{
+    static dispatch_once_t pred;
+    static KRFacebook *_krFacebook = nil;
+    dispatch_once(&pred, ^{
+        _krFacebook = [[KRFacebook alloc] init];
+    });
+    return _krFacebook;
+    //return [[self alloc] init];
+}
+
+-(KRFacebook *)initWithDelegate:(id<KRFacebookDelegate>)_sdkDelegate
+{
     self = [super init];
     if( self ){
         [self _initWithCommonVars:FACEBOOK_DEVELOPER_KEY andDelegate:_sdkDelegate];
@@ -274,15 +363,6 @@
     return self;
 }
 
--(void)dealloc{
-    [jsonWriter release];
-    [facebook release];
-    [devKey release];
-    [executing release];
-    [fbPermissons release];
-    
-    [super dealloc];
-}
 
 #pragma Settup Attach Configs
 -(NSDictionary *)setConfigsOfVideoUrl:(NSString *)videoSrc 
@@ -331,7 +411,6 @@
                                      nil]];
     }
     NSArray *mediaConfigs = [NSArray arrayWithArray:tempMediaConfigs];
-    [tempMediaConfigs release];
     return mediaConfigs;
 }
 
@@ -388,10 +467,14 @@
     self.executing  = @"post.feeds.word";
     self.processing = KRFacebookProcessForPublishOnFeeds;
     //REST API
-    [facebook requestWithMethodName:@"stream.publish" 
-                          andParams:params 
-                      andHttpMethod:@"POST" 
-                        andDelegate:self];
+    __block FBRequest *_fbRequest = [[FBRequest alloc] initWithSession:self.fbSession
+                                                    restMethod:@"stream.publish"
+                                                    parameters:params
+                                                    HTTPMethod:@"POST"];
+    [_fbRequest startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self _requestDidLoadResult:result];
+    }];
+    
 }
 
 //[多媒體留言] : 文字 + Youtube Flash 影片 / 圖片 / 音樂
@@ -408,10 +491,14 @@
                                        nil];
     self.executing  = @"post.feeds.media"; 
     self.processing = KRFacebookProcessForPublishOnMedia;
-    [facebook requestWithMethodName:@"stream.publish" 
-                          andParams:params 
-                      andHttpMethod:@"POST" 
-                        andDelegate:self]; 
+    __block FBRequest *_fbRequest = [[FBRequest alloc] initWithSession:self.fbSession
+                                                    restMethod:@"stream.publish"
+                                                    parameters:params
+                                                    HTTPMethod:@"POST"];
+    [_fbRequest startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self _requestDidLoadResult:result];
+    }];
+    
 }
 
 /*
@@ -547,10 +634,15 @@
     self.processing = KRFacebookProcessForUploadPhoto;
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:[self _setupParamsWithUploadImageUrl:_imageUrl 
                                                                                                     imageDescription:_description]];
-    [facebook requestWithMethodName:@"photos.upload"
-                          andParams:params
-                      andHttpMethod:@"POST"
-                        andDelegate:self];    
+
+    __block FBRequest *_fbRequest = [[FBRequest alloc] initWithSession:self.fbSession
+                                                    restMethod:@"photos.upload"
+                                                    parameters:params
+                                                    HTTPMethod:@"POST"];
+    [_fbRequest startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self _requestDidLoadResult:result];
+    }];
+    
 }
 
 /*
@@ -566,10 +658,14 @@
 								   _image, @"picture",
                                    _description, @"caption",
 								   nil];
-    [facebook requestWithMethodName:@"photos.upload"
-                          andParams:params
-                      andHttpMethod:@"POST"
-                        andDelegate:self]; 
+    __block FBRequest *_fbRequest = [[FBRequest alloc] initWithSession:self.fbSession
+                                                    restMethod:@"photos.upload"
+                                                    parameters:params
+                                                    HTTPMethod:@"POST"];
+    [_fbRequest startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self _requestDidLoadResult:result];
+    }];
+    
 }
 
 /*
@@ -596,10 +692,14 @@
 -(void)getVideoUploadLimit{
     self.executing  = @"get.upload.limit.size"; //@"getVideoUploadLimit";
     self.processing = KRFacebookProcessForGetVideoUploadLimit;
-    [facebook requestWithMethodName:@"video.getUploadLimits" 
-                          andParams:nil 
-                      andHttpMethod:@"POST" 
-                        andDelegate:self];
+    __block FBRequest *_fbRequest = [[FBRequest alloc] initWithSession:self.fbSession
+                                                    restMethod:@"video.getUploadLimits" 
+                                                    parameters:nil
+                                                    HTTPMethod:@"POST"];
+    [_fbRequest startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        [self _requestDidLoadResult:result];
+    }];
+    
 }
 
 #pragma Extra Methods
@@ -620,44 +720,74 @@
  *   傳入 likes       : 委派判斷 get.user.links        :: 取得個人按過讚的粉絲團( 加入過的 )
  *   傳入 events      : 委派判斷 get.user.events       :: 取得個人正在進行的活動事件
  */
--(void)getUserInfoWithKindOf:(NSString *)_kindOf{
-    //請求的 Graph API 方法
-    if( [_kindOf isEqualToString:@"photos"] ){
+-(void)getUserInfoWithKindOf:(NSString *)_kindOf
+{
+    __block FBRequest *_fbRequest = nil;
+    /*
+     * @ 請求的 Graph API 方法
+     */
+    if( [_kindOf isEqualToString:@"photos"] )
+    {
+        //取得使用者相片
         self.executing  = @"get.user.photos";
         self.processing = KRFacebookProcessForGetUserPhotos;
-        //取得使用者相片
-        [facebook requestWithGraphPath:@"me/photos" andDelegate:self];
-    }else if( [_kindOf isEqualToString:@"permissions"] ){
+        //這樣才能正確執行 ... 
+        _fbRequest = [[FBRequest alloc] initWithSession:self.fbSession graphPath:@"me/photos"];
+    }
+    else if( [_kindOf isEqualToString:@"permissions"] )
+    {
+        //取得認證類型資訊 
         self.executing  = @"get.user.permissions";
         self.processing = KRFacebookProcessForGetUserPermissions;
-        //取得認證類型資訊 
-        [facebook requestWithGraphPath:@"me/permissions" andDelegate:self];
-    }else if( [_kindOf isEqualToString:@"feed"] ){
+        _fbRequest = [[FBRequest alloc] initWithSession:self.fbSession graphPath:@"me/permissions"];
+    }
+    else if( [_kindOf isEqualToString:@"feed"] )
+    {
+        //取得塗鴉牆資訊
         self.executing  = @"get.user.feeds";
         self.processing = KRFacebookProcessForGetUserFeeds;
-        //取得塗鴉牆資訊
-        [facebook requestWithGraphPath:@"me/feed" andDelegate:self];    
-    }else if( [_kindOf isEqualToString:@"friends"] ){
+        _fbRequest = [[FBRequest alloc] initWithSession:self.fbSession graphPath:@"me/feed"];
+    }
+    else if( [_kindOf isEqualToString:@"friends"] )
+    {
+        //取得朋友群資訊
         self.executing  = @"get.user.friends";
         self.processing = KRFacebookProcessForGetUserFriends;
-        //取得朋友群資訊
-        [facebook requestWithGraphPath:@"me/friends" andDelegate:self];
-    }else if( [_kindOf isEqualToString:@"albums"] ){
+        _fbRequest = [[FBRequest alloc] initWithSession:self.fbSession graphPath:@"me/friends"];
+    }
+    else if( [_kindOf isEqualToString:@"albums"] )
+    {
+        //取得相簿資訊
         self.executing  = @"get.user.albums"; 
         self.processing = KRFacebookProcessForGetUserAlbums;
-        //取得相簿資訊
-        [facebook requestWithGraphPath:@"me/albums" andDelegate:self];
-    }else if( [_kindOf isEqualToString:@"uploads"] ){
+        _fbRequest = [[FBRequest alloc] initWithSession:self.fbSession graphPath:@"me/permissions"];
+    }
+    else if( [_kindOf isEqualToString:@"uploads"] )
+    {
+        //取得個人上傳過的影音資料
         self.executing  = @"get.user.uploads";
         self.processing = KRFacebookProcessForGetUserUploads;
-        //取得個人上傳過的影音資料
-        [facebook requestWithGraphPath:@"me/videos/uploaded" andDelegate:self];
-    }else{
+        _fbRequest = [[FBRequest alloc] initWithSession:self.fbSession graphPath:@"me/videos/uploaded"];
+    }
+    else
+    {
+        //取得個人資訊
         self.executing  = @"get.user.informations";
         self.processing = KRFacebookProcessForGetUserInfo;
-        //取得個人資訊
-        [facebook requestWithGraphPath:@"me" andDelegate:self];
+        _fbRequest = [[FBRequest alloc] initWithSession:self.fbSession graphPath:@"me"];
     }
+    
+    [_fbRequest startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        if( !error ){
+            //NSLog(@"me %@", result);
+            [self _requestDidLoadResult:result];
+        }else{
+            //NSLog(@"error : %@", error.description);
+            [self _requestDidFailWithError:error];
+        }
+
+    }];
+    
 }
 
 /*
@@ -682,8 +812,8 @@
 -(void)saveUserInfos:(BOOL)_saveOrClear{
     if( _saveOrClear ){
         self.saveUser = YES;
-        [[NSUserDefaults standardUserDefaults] setObject:facebook.accessToken forKey:FACEBOOK_ACCESS_TOKEN_KEY];
-        [[NSUserDefaults standardUserDefaults] setObject:facebook.expirationDate forKey:FACEBOOK_EXPIRATION_DATE_KEY];
+        [[NSUserDefaults standardUserDefaults] setObject:self.fbSession.accessToken forKey:FACEBOOK_ACCESS_TOKEN_KEY];
+        [[NSUserDefaults standardUserDefaults] setObject:self.fbSession.expirationDate forKey:FACEBOOK_EXPIRATION_DATE_KEY];
         [self getUserInfoWithKindOf:@"me"];
     }else{
         self.saveUser = NO;
@@ -692,7 +822,7 @@
         [[NSUserDefaults standardUserDefaults] setObject:nil forKey:FACEBOOK_USER_ACCOUNT_KEY];
         [[NSUserDefaults standardUserDefaults] setObject:nil forKey:FACEBOOK_USER_ID_KEY];
     }
-    [[NSUserDefaults standardUserDefaults] synchronize]; 
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 /*
@@ -701,20 +831,69 @@
  * 
  * @附註
  *   如果沒有連網路，會無法出現 Facebook 的登入畫面
+ *
+ * @ FB API : V2.0 to V3.1 的差別 
+ *   https://developers.facebook.com/docs/tutorial/iossdk/upgrading-from-2.0-to-3.1/#apichanges
+ *
  */
 -(void)loginWithPermissions:(NSArray *)permissions{
-    //讀出之前儲存的 Access Token / Expiration Date ( 時效從 2013 年開始，官方改成只有 2 個月保存期 )
-    if( !self.isLogged ){
-        self.isLogged = [self alreadyLogged];
-    }
-    if( !self.isLogged ){
+    /*
+     * @ 這樣就能正確登入並取得 Token
+     */
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    self.fbSession = appDelegate.session;
+    //[self logout];
+    //NSLog(@"appDelegate.session.isOpen %i", appDelegate.session.isOpen);
+    if(!appDelegate.session.isOpen){
+        //建立一個新的 FBSession
         if( [permissions count] > 0 ){
             self.fbPermissons = permissions;
         }
-        facebook.toUpdateSession = NO;
-        [facebook authorize:self.fbPermissons];
+        appDelegate.session = [[FBSession alloc] initWithPermissions:self.fbPermissons];
+        /*
+         * @ Note 2013/02/11 23:00
+         *   - 因為 In-App WebView 的方式突然被 Facebook 官方改掉，所以，就先改成跳出 App 的方式進行登入，
+         *     因為只需要登入一次就夠了，這部份的 UXD 對使用者而言，不會造成什麼困擾。
+         *     但是，Facebook SDK 3.x 的版本很常出錯，像今天測試就有出現好幾次「到 Safari 開啟時，是出現 Error 登入頁的窘況」。
+         *
+         *   - 如果要再改回 In-App WebView 的方式，就在這裡改回即可。但這還要看 FB 官方是否有開放 ... Orz
+         *
+         * @ Note 2013/02/12 10:00
+         *
+         *   - In-App WebView 的問題，官方似乎修正開放了，SDK 2.0 ~ 3.x 能正常執行中。( 但這裡還是要改成 SDK 3.1.1 的版本，以免官方又有問題 )
+         *
+         * @ Note 2013/03/12 AM 01:39
+         *   
+         *   - 應 Sky Lin 之要求，將登入方式從原先的 In-App WebView 的模式，改成使用專頁小助手的模式。
+         *     也就是如果 User 有在 iPhone 的官方 Settings 裡設定 Facebook 帳號，
+         *     或是 User 的 iPhone 裡有「Facebook 的官方 App」，
+         *     則就能直接不輸入帳密登入，而如果以上都沒有設定，則會開啟 Safari 進行登入。
+         *
+         *   - FBSessionLoginBehaviorForcingWebView Changed to FBSessionLoginBehaviorUseSystemAccountIfPresent
+         *
+         */
+        [appDelegate.session openWithBehavior:FBSessionLoginBehaviorUseSystemAccountIfPresent completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
+            //NSLog(@"token : %@", session.accessToken);
+            //NSLog(@"expirationDate : %@", session.expirationDate);
+            //NSLog(@"permissions : %@", session.permissions);
+            //
+            self.fbSession = appDelegate.session;
+            /* 
+             * @ FBSession.activeSession.isOpen 同等 [facebook isSessionValid]
+             */
+            self.isLogged = self.fbSession.isOpen;
+            if( self.fbSession.isOpen ){
+                [self fbDidLogin];
+            }else{
+                [self fbDidNotLogin:YES];
+            }
+            if( status == FBSessionStateCreatedTokenLoaded ){
+                //...
+            }
+            //NSLog(@"status : %i", status);
+        }];
     }else{
-        facebook.toUpdateSession = YES;
+        self.isLogged = self.fbSession.isOpen;
         [self fbDidLogin];
     }
 }
@@ -722,18 +901,44 @@
 /*
  * @直接使用預設的 Permissions 項目登入
  */
--(void)login{
+-(void)login
+{
     [self loginWithPermissions:nil];
 }
 
 /*
  * 執行登出
  */
--(void)logout{
+-(void)logout
+{
     self.isLogged = NO;
-    //facebook.accessToken    = nil;
-    //facebook.expirationDate = nil;
-    [facebook logout:self];
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    self.fbSession = appDelegate.session;
+    [self.fbSession closeAndClearTokenInformation];
+    [self fbDidLogout];
+    self.fbSession = nil;
+    NSHTTPCookieStorage* cookies = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+    NSArray* facebookCookies = [cookies cookiesForURL:
+                                [NSURL URLWithString:@"http://login.facebook.com"]];
+    
+    for (NSHTTPCookie* cookie in facebookCookies) {
+        [cookies deleteCookie:cookie];
+    }
+    /*
+     * @加入下面這行就解決了登出異常的問題
+     *
+     *   原來是 Cookie 的暫存問題，造成了 Loging 會無限制的登入，
+     *   即登出後，再按登入，會因為「清不乾淨」而再次直接性的登入，連帳密都不用打 ( XD )，
+     *   所以才會有 Cookie 時效到了之後，突然登出「成功」的情況。
+     */
+    for (NSHTTPCookie *cookie in [cookies cookies]){
+        NSString* domainName = [cookie domain];
+        //NSLog(@"domainName 1 : %@", domainName);
+        NSRange domainRange = [domainName rangeOfString:@"facebook"];
+        if(domainRange.length > 0){
+            [cookies deleteCookie:cookie];
+        }
+    }
 }
 
 /*
@@ -782,15 +987,33 @@
 }
 
 /*
- * @是否已登入
- *  如直接先執行這裡，則會將原先儲存的 FB TOKEN 值取出來認證
- *  這裡會執行 2 次 ( I don't know Why ?! XD 之後再找個時間重構 KRFacebook + ExtLogin )
+ * @ 是否已登入
+ *   如直接先執行這裡，則會將原先儲存的 FB TOKEN 值取出來認證
+ *   這裡會執行 2 次 ( I don't know Why ?! )
+ * 
+ * @ 需注意這裡的 appDelegate.session 在登出時，
+ *   如果 session 並沒有被完全的「正式啟動過」( 也就是沒有正式跑一輪「登入」的流程 )，就會操控失敗 ( 活化失敗 XD )。
  */
--(BOOL)alreadyLogged{
-    facebook.accessToken    = [[NSUserDefaults standardUserDefaults] objectForKey:FACEBOOK_ACCESS_TOKEN_KEY];
-    facebook.expirationDate = [[NSUserDefaults standardUserDefaults] objectForKey:FACEBOOK_EXPIRATION_DATE_KEY];
-    self.isLogged = [facebook isSessionValid];
+-(BOOL)alreadyLogged
+{
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    self.fbSession = appDelegate.session;
+    self.isLogged  = self.fbSession.isOpen;
+    //self.isLogged = ( self.fbSession.isOpen || [self.fbSession.accessToken length] > 0 );
     return self.isLogged;
+}
+
+/*
+ * @ 喚醒 Facebook Session
+ */
++(BOOL)awakeSession
+{
+    return [[KRFacebook sharedManager] alreadyLogged];
+}
+
+-(BOOL)awakeSession
+{
+    return [self alreadyLogged];
 }
 
 /*
@@ -805,14 +1028,13 @@
  */
 -(void)clearDelegates{
     self.delegate = nil;
-    self.facebook.sessionDelegate = nil;
 }
 
 /*
  * @取得 Token
  */
 -(NSString *)getToken{
-    return [[[NSUserDefaults standardUserDefaults] objectForKey:FACEBOOK_ACCESS_TOKEN_KEY] stringValue];
+    return [[NSUserDefaults standardUserDefaults] objectForKey:FACEBOOK_ACCESS_TOKEN_KEY];
 }
 
 /*
@@ -822,12 +1044,13 @@
     return [self _getSavedDatas];
 }
 
+
 #pragma FacebookDelegate
 /*
- * 成功登入 ( 因為 Login 會需要取得一些個人資訊，所以會再觸發 request:didLoad: 的委派 )
+ * 成功登入 ( 因為 Login 會需要取得一些個人資訊，所以會再觸發 request:didLoad: ( 同時觸發 krFacebookDidFinishAllRequests ) 的委派 )
  */
 -(void)fbDidLogin{
-    if( [facebook isSessionValid] ){
+    if( self.fbSession.isOpen ){
         self.isLogged = YES;
         [self saveAccessToken:YES];
     }else{
@@ -844,6 +1067,11 @@
     if( !self.isLogged && [self.delegate respondsToSelector:@selector(krFacebookDidFailedLogin)] ){
         [self.delegate krFacebookDidFailedLogin];
     }
+    
+//    if( [self.delegate respondsToSelector:@selector(krFacebookDidFinishAllRequests)] ){
+//        [self.delegate krFacebookDidFinishAllRequests];
+//    }
+    
 }
 
 /*
@@ -858,6 +1086,9 @@
     }
     if( cancelled && [self.delegate respondsToSelector:@selector(krFacebookDidCancel)] ){
         [self.delegate krFacebookDidCancel];
+    }
+    if( [self.delegate respondsToSelector:@selector(krFacebookDidFinishAllRequests)] ){
+        [self.delegate krFacebookDidFinishAllRequests];
     }
     //NSLog(@"fbDidNotLogin : %i", cancelled);
 }
@@ -878,74 +1109,14 @@
     if( !self.isLogged && [self.delegate respondsToSelector:@selector(krFacebookDidLogout)] ){
         [self.delegate krFacebookDidLogout];
     }
-    //NSLog(@"fbDidLogout");
-}
-
-#pragma FBRequestDelegate + FBSessionDelegate
--(void)requestLoading:(FBRequest *)request{
-    
-}
-
-- (void)request:(FBRequest *)request didReceiveResponse:(NSURLResponse *)response {
-
-}
-
--(void)request:(FBRequest *)request didLoad:(id)result{
-	if ( [result isKindOfClass:[NSArray class]] ) {        
-		result = [result objectAtIndex:0];
-	}
-    
-    if( [result isKindOfClass:[NSData class]] ){
-        NSString *_tempResult = [[NSString alloc] initWithData:(NSData *)result encoding:NSUTF8StringEncoding];
-        result = [NSString stringWithString:_tempResult];
-        [_tempResult release];
-    }
-
-    self.isString = [result isKindOfClass:[NSString class]] ? YES : NO;
-
-    if( [self.delegate respondsToSelector:@selector(krFacebook:didLoadWithResponses:andKindOf:)] ){
-        [self.delegate krFacebook:self didLoadWithResponses:result andKindOf:self.executing];
-    }
-
-    if( self.isString && [self.delegate respondsToSelector:@selector(krFacebook:didLoadWithResponseOfString:andKindOf:)] ){
-        [self.delegate krFacebook:self didLoadWithResponseOfString:result andKindOf:self.executing];
-    }else{
-        if( self.saveUser ){
-            self.saveUser = NO;
-            [self _savingPrivateInformationOfUserInApp:result];
-        }
-        if( [result isKindOfClass:[NSDictionary class]] &&
-            [self.delegate respondsToSelector:@selector(krFacebook:didLoadWithResponsesOfDictionary:andKindOf:)]){
-            [self.delegate krFacebook:self didLoadWithResponsesOfDictionary:result andKindOf:self.executing];
-        }
-    }
-    
     if( [self.delegate respondsToSelector:@selector(krFacebookDidFinishAllRequests)] ){
         [self.delegate krFacebookDidFinishAllRequests];
     }
-    //NSLog(@"fbRequest didLoad (FinishAllRequests)");
+    //NSLog(@"fbDidLogout");
 }
 
--(void)request:(FBRequest *)request didFailWithError:(NSError *)error {
-    if( [self.delegate respondsToSelector:@selector(krFacebook:didFailWithResponses:andKindOf:)] ){
-        [self.delegate krFacebook:self didFailWithResponses:error andKindOf:self.executing];
-    }
-}
 
-/*
- * Facebook Dialog
- */
--(void)dialogDidComplete:(FBDialog *)dialog {
-	//NSLog(@"Publish Successfully! \n");
-}
 
--(void)fbDidExtendToken:(NSString *)accessToken expiresAt:(NSDate *)expiresAt{
-    //NSLog(@"accessToken : %@", accessToken);
-}
-
--(void)fbSessionInvalidated{
-    //NSLog(@"fbSessionInvalidated");
-}
 
 
 @end

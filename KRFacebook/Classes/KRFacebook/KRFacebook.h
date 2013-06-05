@@ -1,30 +1,30 @@
 //
 //  KRFacebook.h
 //
-//  Created by Kuo-Ming Lin ( Kalvar ; ilovekalvar@gmail.com ) on 2012/10/20.
-//  Copyright (c) 2012年 Kuo-Ming Lin. All rights reserved.
+//  Created by Kuo-Ming Lin ( Kalvar ; ilovekalvar@gmail.com ) on 2013/01/20.
+//  Copyright (c) 2013年 Kuo-Ming Lin. All rights reserved.
 //
 
 /*
- * 1). 已整合 Facebook SDK 3.0
- * 2). 待整合 Open Graph API
+ * 1). Integrated Facebook SDK 3.1 ( that you can change to high version of sdk. )
+ * 2). Waiting for integrate Open Graph API
  */
 
 #import <Foundation/Foundation.h>
-#import "FBConnect.h"
-#import "FBLoginButton.h"
-
+#import <FacebookSDK/FacebookSDK.h>
+#import "FBSBJSON.h"
 #define FACEBOOK_ACCESS_TOKEN_KEY    @"FBAccessToken"
 #define FACEBOOK_EXPIRATION_DATE_KEY @"FBExpirationDate"
 #define FACEBOOK_USER_ACCOUNT_KEY    @"FBUserAccount"
 #define FACEBOOK_USER_ID_KEY         @"FBUserId"
 #define FACEBOOK_USER_NAME_KEY       @"FBUserName"
-#define FACEBOOK_DEVELOPER_KEY       @"Your Facebook App Developer Key"
+#define FACEBOOK_DEVELOPER_KEY       @"471387499581928"
 
 /*
  * 當前的執行動作集合
  */
-typedef enum _KRFacebookProcess{
+typedef enum _KRFacebookProcess
+{
     KRFacebookProcessForNothing = 0,
     KRFacebookProcessForPublishOnFeeds,
     KRFacebookProcessForPublishOnPhoto,
@@ -48,11 +48,12 @@ typedef enum _KRFacebookProcess{
 } KRFacebookProcess;
 
 @protocol KRFacebookDelegate;
-//@class Facebook;
 @class FBSBJSON;
+@class Facebook;
 
-@interface KRFacebook : NSObject <FBRequestDelegate, FBDialogDelegate, FBSessionDelegate>{
-    id<KRFacebookDelegate> delegate;
+@interface KRFacebook : NSObject
+{
+    id<KRFacebookDelegate> __weak delegate;
     FBSBJSON *jsonWriter;
     NSString *devKey;
     BOOL isLogged;    
@@ -60,20 +61,25 @@ typedef enum _KRFacebookProcess{
     NSArray *fbPermissons;   
     int processing;
     NSString *executing;
+    FBSession *fbSession;
 }
 
-@property (nonatomic, assign) id<KRFacebookDelegate> delegate;
-@property (nonatomic, retain) FBSBJSON *jsonWriter;
-@property (nonatomic, retain) NSString *devKey;
+@property (nonatomic, weak) id<KRFacebookDelegate> delegate;
+@property (nonatomic, strong) FBSBJSON *jsonWriter;
+@property (nonatomic, strong) NSString *devKey;
 @property (nonatomic, assign) BOOL isLogged;
 @property (nonatomic, assign) BOOL saveUser;
-@property (nonatomic, retain) NSArray *fbPermissons;
+@property (nonatomic, strong) NSArray *fbPermissons;
 @property (nonatomic, assign) int processing;
-@property (nonatomic, retain) NSString *executing;
+@property (nonatomic, strong) NSString *executing;
+
+
+@property (nonatomic, strong) FBSession *fbSession;
 
 /*
  * initialize
  */
++(KRFacebook *)sharedManager;
 -(KRFacebook *)initWithDelegate:(id<KRFacebookDelegate>)_sdkDelegate;
 -(KRFacebook *)initWithDevKey:(NSString *)_devKey
                       delegate:(id<KRFacebookDelegate>)_sdkDelegate;
@@ -259,6 +265,12 @@ typedef enum _KRFacebookProcess{
 -(BOOL)alreadyLogged;
 
 /*
+ * @ 喚醒 Facebook Session
+ */
++(BOOL)awakeSession;
+-(BOOL)awakeSession;
+
+/*
  * @清除已儲存的 FB 個人資訊
  */
 -(void)clearSavedDatas;
@@ -269,14 +281,9 @@ typedef enum _KRFacebookProcess{
 -(void)clearDelegates;
 
 /*
- * @取得 Token
+ * @ 取得 Token
  */
 -(NSString *)getToken;
-
-/*
- * @取得已儲存的個人資料
- */
--(NSDictionary *)getSavedDatas;
 
 @end
 

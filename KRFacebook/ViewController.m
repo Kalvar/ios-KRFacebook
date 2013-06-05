@@ -18,15 +18,13 @@
 
 - (void)viewDidLoad
 {
+    [super viewDidLoad];
     facebook = [[KRFacebook alloc] initWithDelegate:self];
     //facebook = [[KRFacebook alloc] initWithDevKey:@"Your Developer Key of Facebook App" delegate:self];
-    [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+    
 }
 
 -(void)viewDidAppear:(BOOL)animated{
-//    [facebook logout];
-//    [facebook login];
     [super viewDidAppear:animated];
 }
 
@@ -36,21 +34,21 @@
     // Dispose of any resources that can be recreated.
 }
 
--(void)dealloc{
-    [facebook release];
-    [super dealloc];
-}
 
 #pragma IBActions
--(IBAction)publishAFeed:(id)sender{
-    [self.facebook alreadyLogged];
-    //To publish a feed.
-    [self.facebook publishOnFeedsWallWithTitle:@"Test Topic"
-                                  andTitleHref:@"http://www.google.com"
-                                    andMessage:@"Test Content"];
+-(IBAction)publishAFeed:(id)sender
+{
+    if( [self.facebook alreadyLogged] )
+    {
+        //To publish a feed.
+        [self.facebook publishOnFeedsWallWithTitle:@"Test Topic"
+                                      andTitleHref:@"http://www.google.com"
+                                        andMessage:@"Test Content"];
+    }
 }
 
--(IBAction)publishImage:(id)sender{
+-(IBAction)publishImage:(id)sender
+{
     [self.facebook publishFeedsWithImageSrc:@"http://sample.com/sample1.jpg"
                                   imageJump:@"http://www.google.com"
                                       title:@"An Image Testing Topic."
@@ -62,34 +60,40 @@
                                 miniMessage:@"Nothing else."];
 }
 
--(IBAction)login:(id)sender{
+-(IBAction)login:(id)sender
+{
     [self.facebook login];
 }
 
--(IBAction)logout:(id)sender{
+-(IBAction)logout:(id)sender
+{
     [self.facebook logout];
 }
 
 #pragma KRFacebookDelegate
--(void)krFacebookDidLogin{
-    //NSLog(@"krFacebookDidLogin");
+-(void)krFacebookDidLogin
+{
+    NSLog(@"krFacebookDidLogin");
 }
 
--(void)krFacebookDidLogout{
-    //NSLog(@"krFacebookDidLogout");
+-(void)krFacebookDidLogout
+{
+    NSLog(@"krFacebookDidLogout");
 }
 
--(void)krFacebookDidCancel{
-    //NSLog(@"krFacebookDidCancel");
+-(void)krFacebookDidCancel
+{
+    NSLog(@"krFacebookDidCancel");
 }
 
--(void)krFacebookDidFinishAllRequests{
-    //NSLog(@"krFacebookDidFinishAllRequests");
-    
+-(void)krFacebookDidFinishAllRequests
+{
+    NSLog(@"krFacebookDidFinishAllRequests");
 }
 
--(void)krFacebook:(KRFacebook *)_krFacebook didSavedUserPrivations:(NSDictionary *)_savedDatas{
-    //NSLog(@"datas : %@", _savedDatas);
+-(void)krFacebook:(KRFacebook *)_krFacebook didSavedUserPrivations:(NSDictionary *)_savedDatas
+{
+    NSLog(@"datas : %@", _savedDatas);
 }
 
 

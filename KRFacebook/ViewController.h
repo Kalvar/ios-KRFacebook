@@ -13,6 +13,6 @@
 
 @interface ViewController : UIViewController<KRFacebookDelegate>
 
-@property (nonatomic, retain) KRFacebook *facebook;
+@property (nonatomic, strong) KRFacebook *facebook;
 
 @end

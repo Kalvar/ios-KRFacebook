@@ -1,31 +1,28 @@
 ## Supports
 
-KRFacebook integrates Facebook 3.0, it also supports MRC ( Manual Reference Counting ). But it still have no support Graph API and all of New 3.x APIs. We'll try to integrate it as soon as possible. If you did want it support to ARC, that just use Xode tool to auto convert to ARC. ( Xcode > Edit > Refactor > Convert to Objective-C ARC )
+KRFacebook integrates Facebook 3.1, and it supports ARC.
 
 ## How To Get Started
 
-To import "KRFacebook.h".
-
 ``` objective-c
-@property (nonatomic, retain) KRFacebook *facebook;
 
-- (void)viewDidLoad
+import "KRFacebook.h"
+
+@property (nonatomic, strong) KRFacebook *facebook;
+
+-(IBAction)publishAFeed:(id)sender
 {
-    facebook = [[KRFacebook alloc] initWithDelegate:self];
-    //facebook = [[KRFacebook alloc] initWithDevKey:@"Your Developer Key of Facebook App" delegate:self];
-    [super viewDidLoad];
+    if( [self.facebook alreadyLogged] )
+    {
+        //To publish a feed.
+        [self.facebook publishOnFeedsWallWithTitle:@"Test Topic"
+                                      andTitleHref:@"http://www.google.com"
+                                        andMessage:@"Test Content"];
+    }
 }
 
-#pragma IBActions
--(IBAction)publishAFeed:(id)sender{
-    [self.facebook alreadyLogged];
-    //To publish a feed.
-    [self.facebook publishOnFeedsWallWithTitle:@"Test Topic"
-                                  andTitleHref:@"http://www.google.com"
-                                    andMessage:@"Test Content"];
-}
-
--(IBAction)publishImage:(id)sender{
+-(IBAction)publishImage:(id)sender
+{
     [self.facebook publishFeedsWithImageSrc:@"http://sample.com/sample1.jpg"
                                   imageJump:@"http://www.google.com"
                                       title:@"An Image Testing Topic."
@@ -37,18 +34,20 @@ To import "KRFacebook.h".
                                 miniMessage:@"Nothing else."];
 }
 
--(IBAction)login:(id)sender{
+-(IBAction)login:(id)sender
+{
     [self.facebook login];
 }
 
--(IBAction)logout:(id)sender{
+-(IBAction)logout:(id)sender
+{
     [self.facebook logout];
 }
 ```
 
 ## Version
 
-KRFacebook now is V0.9 Beta.
+KRFacebook now is V1.0.
 
 ## License
 
