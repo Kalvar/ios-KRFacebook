@@ -864,15 +864,17 @@
          *
          * @ Note 2013/03/12 AM 01:39
          *   
-         *   - 應 Sky Lin 之要求，將登入方式從原先的 In-App WebView 的模式，改成使用專頁小助手的模式。
+         *   - 將登入方式從原先的 In-App WebView 的模式，改成使用專頁小助手的模式。
          *     也就是如果 User 有在 iPhone 的官方 Settings 裡設定 Facebook 帳號，
          *     或是 User 的 iPhone 裡有「Facebook 的官方 App」，
          *     則就能直接不輸入帳密登入，而如果以上都沒有設定，則會開啟 Safari 進行登入。
          *
          *   - FBSessionLoginBehaviorForcingWebView Changed to FBSessionLoginBehaviorUseSystemAccountIfPresent
+         *   - FBSessionLoginBehaviorUseSystemAccountIfPresent Changed to FBSessionLoginBehaviorWithNoFallbackToWebView 
+         *     ( 這樣才能避免 Apple Settings 裡有綁定 Facebook Account 時，登入失效的問題。 )
          *
          */
-        [appDelegate.session openWithBehavior:FBSessionLoginBehaviorUseSystemAccountIfPresent completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
+        [appDelegate.session openWithBehavior:FBSessionLoginBehaviorWithNoFallbackToWebView completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
             //NSLog(@"token : %@", session.accessToken);
             //NSLog(@"expirationDate : %@", session.expirationDate);
             //NSLog(@"permissions : %@", session.permissions);
