@@ -43,6 +43,11 @@ import "KRFacebook.h"
 {
     [self.facebook logout];
 }
+
+-(IBAction)awakeSession:(id)sender
+{
+    [self.facebook awakeSession];
+}
 ```
 
 ## Version

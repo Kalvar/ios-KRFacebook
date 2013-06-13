@@ -70,6 +70,11 @@
     [self.facebook logout];
 }
 
+-(IBAction)awakeSession:(id)sender
+{
+    [self.facebook awakeSession];
+}
+
 #pragma KRFacebookDelegate
 -(void)krFacebookDidLogin
 {
