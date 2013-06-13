@@ -6,7 +6,7 @@ KRFacebook integrates Facebook 3.1, and it supports ARC.
 
 ``` objective-c
 
-import "KRFacebook.h"
+#import "KRFacebook.h"
 
 @property (nonatomic, strong) KRFacebook *facebook;
 
