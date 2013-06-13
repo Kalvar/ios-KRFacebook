@@ -999,9 +999,21 @@
 -(BOOL)alreadyLogged
 {
     AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    if( [appDelegate.session.accessToken length] > 0 )
+    {
+        if( !appDelegate.session.isOpen )
+        {
+            //這裡重複呼叫是會 Crash 的，要小心使用
+            [appDelegate.session openWithCompletionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
+                //...
+            }];
+        }
+    }
     self.fbSession = appDelegate.session;
     self.isLogged  = self.fbSession.isOpen;
-    //self.isLogged = ( self.fbSession.isOpen || [self.fbSession.accessToken length] > 0 );
+    return self.isLogged;
+    self.fbSession = appDelegate.session;
+    self.isLogged  = self.fbSession.isOpen;
     return self.isLogged;
 }
 
