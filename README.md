@@ -1,8 +1,10 @@
 ## Supports
 
-KRFacebook integrates Facebook 3.1, and it supports ARC.
+KRFacebook integrates Facebook 3.1, and it supports to 3.3 and ARC.
 
 ## How To Get Started
+
+It need to setup the Facebook Developer Key for FACEBOOK_DEVELOPER_KEY in KRFacebook.h, and go to *-info.plist set the facebook developer key up with following the Facebook rules too.
 
 ``` objective-c
 
@@ -52,7 +54,7 @@ KRFacebook integrates Facebook 3.1, and it supports ARC.
 
 ## Version
 
-KRFacebook now is V1.0.
+KRFacebook now is V1.1.
 
 ## License
 
