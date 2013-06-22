@@ -543,12 +543,12 @@
  * @ 一次性設定並發佈多張圖片留言 :: 陣列( imageSrcArray / imageHrefArray 需為互相對應的陣列 )
  * @ Post 多張圖片 : 
  *   //圖片 URL
- *   NSArray *imagesUrls  = [NSArray arrayWithObjects:@"http://www.flashaim.tv/images/poster/fb_poster.png", 
- *                                                    @"http://www.flashaim.tv/images/poster/flashaim_about_poster.png", 
+ *   NSArray *imagesUrls  = [NSArray arrayWithObjects:@"http://www.test.com/images/poster/fb_poster.png", 
+ *                                                    @"http://www.test.com/images/poster/test_about_poster.png", 
  *                                                    nil];
  *   //點選圖片時，要導向的 URL
- *   NSArray *imageJumps = [NSArray arrayWithObjects:@"http://www.flashaim.tv/?menu=fb", 
- *                                                   @"http://www.flashaim.tv/?menu=flashaim_about", 
+ *   NSArray *imageJumps = [NSArray arrayWithObjects:@"http://www.test.com/?menu=fb", 
+ *                                                   @"http://www.test.com/?menu=test_about", 
  *                                                   nil]; 
  */
 -(void)publishFeedsWithImageUrls:(NSArray *)_imageSrcArray
