@@ -6,8 +6,9 @@ KRFacebook integrates Facebook 3.1, and it supports to 3.3 and ARC. You can chan
 
 It need to setup the Facebook Developer Key for FACEBOOK_DEVELOPER_KEY in KRFacebook.h, and go to *-info.plist set the facebook developer key up with following the Facebook rules too.
 
-<img src="https://dl.dropbox.com/u/83663874/GitHubs/KRFacebook-1.png" alt=" *-info.plist" title=" *-info.plist" style="margin: 20px;" class="center" />
 <img src="https://dl.dropbox.com/u/83663874/GitHubs/KRFacebook-2.png" alt="KRFacebook.h" title="KRFacebook.h" style="margin: 20px;" class="center" />
+
+<img src="https://dl.dropbox.com/u/83663874/GitHubs/KRFacebook-1.png" alt=" *-info.plist" title=" *-info.plist" style="margin: 20px;" class="center" />
 
 ``` objective-c
 
