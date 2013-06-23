@@ -1,5 +1,6 @@
 //
 //  KRFacebook.h
+//  V1.2
 //
 //  Created by Kuo-Ming Lin ( Kalvar ; ilovekalvar@gmail.com ) on 2013/01/20.
 //  Copyright (c) 2013年 Kuo-Ming Lin. All rights reserved.
@@ -18,36 +19,55 @@
 #define FACEBOOK_USER_ACCOUNT_KEY    @"FBUserAccount"
 #define FACEBOOK_USER_ID_KEY         @"FBUserId"
 #define FACEBOOK_USER_NAME_KEY       @"FBUserName"
-#define FACEBOOK_DEVELOPER_KEY       @"471387499581928"
+#define FACEBOOK_DEVELOPER_KEY       @"Your Facebook App Developer Key"
 
 /*
  * 當前的執行動作集合
  */
-typedef enum _KRFacebookProcess
+typedef enum _KRFacebookRequests
 {
-    KRFacebookProcessForNothing = 0,
-    KRFacebookProcessForPublishOnFeeds,
-    KRFacebookProcessForPublishOnPhoto,
-    KRFacebookProcessForPublishOnMedia,
-    KRFacebookProcessForLogin,
-    KRFacebookProcessForLogout,
-    KRFacebookProcessForCancell,
-    KRFacebookProcessForLoginFailed,
-    KRFacebookProcessForUploadPhotos,
-    KRFacebookProcessForUploadPhoto,
-    KRFacebookProcessForUploadMedia,
-    KRFacebookProcessForGetUserPhotos,
-    KRFacebookProcessForGetUserPermissions,
-    KRFacebookProcessForGetUserFeeds,
-    KRFacebookProcessForGetUserFriends,
-    KRFacebookProcessForGetUserAlbums,
-    KRFacebookProcessForGetUserUploads,
-    KRFacebookProcessForGetUserInfo,
-    KRFacebookProcessForGetVideoUploadLimit
-    // ... 
-} KRFacebookProcess;
+    //Nothing
+    KRFacebookRequestNothing = 0,
+    //Publish to Feeds
+    KRFacebookRequestPublishToFeeds,
+    //Publish to Photo Album
+    KRFacebookRequestPublishToPhoto,
+    //Publish to Media
+    KRFacebookRequestPublishToMedia,
+    //Login OK
+    KRFacebookRequestLogin,
+    //Logout OK
+    KRFacebookRequestLogout,
+    //Login is Cancelled
+    KRFacebookRequestCancel,
+    //Login is Failed
+    KRFacebookRequestLoginFailed,
+    //Uploading Photos to Someone's Album
+    KRFacebookRequestUploadPhotos,
+    //Uploading a Photo to Someone's Album
+    KRFacebookRequestUploadPhoto,
+    //Uploading a Media ( Video, Music ) to Facebook Walls
+    KRFacebookRequestUploadMedia,
+    //Gets User's Photos
+    KRFacebookRequestGetUserPhotos,
+    //Get User Accepted Permissions
+    KRFacebookRequestGetUserAcceptedPermissions,
+    //Get User Published Feeds
+    KRFacebookRequestGetUserFeeds,
+    //Get User Friends
+    KRFacebookRequestGetUserFriends,
+    //Get User Albums
+    KRFacebookRequestGetUserAlbums,
+    //Get User Uploaded
+    KRFacebookRequestGetUserAllUploaded,
+    //Get User Personal Info
+    KRFacebookRequestGetUserPersonalInfo,
+    //Get Video Upload Limit Size
+    KRFacebookRequestGetVideoUploadLimitSize
+} KRFacebookRequests;
 
 @protocol KRFacebookDelegate;
+
 @class FBSBJSON;
 @class Facebook;
 
@@ -57,10 +77,10 @@ typedef enum _KRFacebookProcess
     FBSBJSON *jsonWriter;
     NSString *devKey;
     BOOL isLogged;    
-    BOOL saveUser;
-    NSArray *fbPermissons;   
-    int processing;
-    NSString *executing;
+    BOOL needSavingUserInfo;
+    NSArray *requestPermissons;
+    KRFacebookRequests requestAction;
+    NSString *requestStatus;
     FBSession *fbSession;
 }
 
@@ -68,12 +88,10 @@ typedef enum _KRFacebookProcess
 @property (nonatomic, strong) FBSBJSON *jsonWriter;
 @property (nonatomic, strong) NSString *devKey;
 @property (nonatomic, assign) BOOL isLogged;
-@property (nonatomic, assign) BOOL saveUser;
-@property (nonatomic, strong) NSArray *fbPermissons;
-@property (nonatomic, assign) int processing;
-@property (nonatomic, strong) NSString *executing;
-
-
+@property (nonatomic, assign) BOOL needSavingUserInfo;
+@property (nonatomic, strong) NSArray *requestPermissons;
+@property (nonatomic, assign) KRFacebookRequests requestAction;
+@property (nonatomic, strong) NSString *requestStatus;
 @property (nonatomic, strong) FBSession *fbSession;
 
 /*
@@ -81,8 +99,8 @@ typedef enum _KRFacebookProcess
  */
 +(KRFacebook *)sharedManager;
 -(KRFacebook *)initWithDelegate:(id<KRFacebookDelegate>)_sdkDelegate;
--(KRFacebook *)initWithDevKey:(NSString *)_devKey
-                      delegate:(id<KRFacebookDelegate>)_sdkDelegate;
+-(KRFacebook *)initWithDevKey:(NSString *)_devKey delegate:(id<KRFacebookDelegate>)_sdkDelegate;
+-(KRFacebook *)initWithPermissions:(NSArray *)_permissions delegate:(id<KRFacebookDelegate>)_sdkDelegate;
 
 /*
  * @附件設定
@@ -188,79 +206,61 @@ typedef enum _KRFacebookProcess
 
 /*
  * @上傳圖片 : 
- *   _imageUrl    = 輸入圖片的 URL 進行上傳
+ *   _photoURL    = 圖片的 HTTP NSURL
+ *   _photoPath   = 圖片的 Local Path
  *   _description = 圖片說明
  */
--(void)uploadWithPhotoUrl:(id)_imageUrl 
-           andDescription:(NSString *)_description; 
-
-/* 
- * @上傳圖片 :
- *   _image       = 直接傳入圖片上傳
- *   _description = 圖片說明
- */
--(void)uploadWithImage:(UIImage *)_image
-        andDescription:(NSString *)_description;
+-(void)uploadWithPhotoURL:(NSURL *)_photoURL description:(NSString *)_description;
+-(void)uploadWithPhotoPath:(NSString *)_photoPath description:(NSString *)_description;
+-(void)uploadWithImage:(UIImage *)_image description:(NSString *)_description;
 
 /*
  * @直接上傳影音至塗鴉牆
- *   _filePath    = 影音檔案的路徑
+ *   _filePath    = 影音檔案的 Local File Path
  *   _title       = PO 文的標題
  *   _description = PO 文的內文
  */
--(void)uploadWithMediaPath:(NSString *)_filePath 
-                  andTitle:(NSString *)_title 
-            andDescription:(NSString *)_description;
+-(void)uploadWithMediaPath:(NSString *)_filePath title:(NSString *)_title description:(NSString *)_description;
 
 /*
  * @取得要上傳至 Facebook 的官方限制大小
  */
--(void)getVideoUploadLimit;
+-(void)getVideoUploadLimitSize;
 
 /*
- * @儲存離線 Access Token 值 : 以便後續自動登入
- */
--(void)saveAccessToken:(BOOL)_saveOrClear;
-
-/*
- * @儲存 User 資訊 : 以便後續處理
- */
--(void)saveUserInfos:(BOOL)_saveOrClear;
-
-/*
- * @取得檔案 MIME Type : 傳入副檔名
+ * @ 取得檔案的 MIME Type : 傳入副檔名
  */
 -(NSString *)getFileMimeTypeWithExt:(NSString *)_fileExt;
 
 /*
- * @取得在 Facebook 上播放的影片 URL
+ * @ 取得在 Facebook 上播放的影片 URL
  */
--(NSString *)getVideoUrlWithId:(NSString *)_videoId;
+-(NSString *)getVideoURLWithId:(NSString *)_videoId;
 
 /*
- * @登入 :
- *   請求認證項目 ( Class 物件 :: 該物件的觸發方法 )
+ * @ 登入 :
+ *   - 請求認證項目 ( Class 物件 :: 該物件的觸發方法 )
  */
 -(void)loginWithPermissions:(NSArray *)permissions;
 
 /*
- * @直接使用預設的 Permissions 項目登入
+ * @ 直接使用預設的 Permissions 項目登入
  */
 -(void)login;
 
 /*
- * @登出
+ * @ 登出
  */
 -(void)logout;
 
 /*
- * @取得個人資訊
+ * @ 取得個人資訊
  */
 -(void)getUserInfoWithKindOf:(NSString *)_kindOf;
 
 /*
- * @是否已登入 ?
- *   如直接先執行這裡，則會將原先儲存的 FB TOKEN 值取出來認證
+ * @ 是否已登入 ?
+ *   - 如直接先執行這裡，則會將原先儲存的 FB TOKEN 值取出來認證
  */
 -(BOOL)alreadyLogged;
 
@@ -271,19 +271,15 @@ typedef enum _KRFacebookProcess
 -(BOOL)awakeSession;
 
 /*
- * @清除已儲存的 FB 個人資訊
+ * @ 清除或儲存 FB AccessToken 與個人資訊
  */
--(void)clearSavedDatas;
-
-/*
- * @清除委派 ( 好像沒用 = = )
- */
+-(void)saveAccessToken;
+-(void)clearAccessToken;
+-(void)savePersonalInfo;
+-(void)clearSavedPersonalInfo;
 -(void)clearDelegates;
 
-/*
- * @ 取得 Token
- */
--(NSString *)getToken;
+-(NSString *)getSavedAccessToken;
 
 @end
 
@@ -295,13 +291,7 @@ typedef enum _KRFacebookProcess
 //Errors
 -(void)krFacebook:(KRFacebook *)_krFacebook didLoadWithErrors:(NSError *)errors;
 //已儲存 User 的私人資訊
--(void)krFacebook:(KRFacebook *)_krFacebook didSavedUserPrivations:(NSDictionary *)_savedDatas;
-//是否成功登入
--(void)krFacebook:(KRFacebook *)_krFacebook didLogin:(BOOL)_isLogin;
-//是否成功登出
--(void)krFacebook:(KRFacebook *)_krFacebook didLogout:(BOOL)_isLogout;
-//是否取消登入
--(void)krFacebook:(KRFacebook *)_krFacebook didCancelLogin:(BOOL)_isCancel;
+-(void)krFacebook:(KRFacebook *)_krFacebook didSavedUserPrivateInfo:(NSDictionary *)_userInfo;
 //成功登入
 -(void)krFacebookDidLogin;
 //成功登出
@@ -311,11 +301,13 @@ typedef enum _KRFacebookProcess
 //登入失敗
 -(void)krFacebookDidFailedLogin;
 //請求完畢 : 取得 Facebook 回傳的萬用型態
+-(void)krFacebookDidLoadWithResponses:(id)_results;
+//請求完畢 : 取得 Facebook 回傳的萬用型態
 -(void)krFacebook:(KRFacebook *)_krFacebook didLoadWithResponses:(id)_results andKindOf:(NSString *)_perform;
 //請求完畢 : 取得 Facebook 回傳的陣列型態值 : andKinfOf 執行什麼動作 ( Ex: get.user.infos )
--(void)krFacebook:(KRFacebook *)_krFacebook didLoadWithResponsesOfDictionary:(NSDictionary *)_results andKindOf:(NSString *)_perform;
+-(void)krFacebook:(KRFacebook *)_krFacebook didLoadWithDictionaryTypeResponses:(NSDictionary *)_results andKindOf:(NSString *)_perform;
 //請求完畢 : 取得 Facebook 回傳的字串型態值 : andKinfOf 執行什麼動作 ( Ex: upload.photos )
--(void)krFacebook:(KRFacebook *)_krFacebook didLoadWithResponseOfString:(NSString *)_result andKindOf:(NSString *)_perform;
+-(void)krFacebook:(KRFacebook *)_krFacebook didLoadWithStringTypeResponse:(NSString *)_result andKindOf:(NSString *)_perform;
 //請求失敗
 -(void)krFacebook:(KRFacebook *)_krFacebook didFailWithResponses:(NSError *)_errors andKindOf:(NSString *)_perform;
 //已完成所有請求

@@ -19,7 +19,22 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    //Default using method.
     facebook = [[KRFacebook alloc] initWithDelegate:self];
+    /*
+    //Customize the facebook permissions if you want, and the permissions will be the default standard request.
+    facebook = [[KRFacebook alloc] initWithPermissions:[NSArray arrayWithObjects:
+                                                        @"read_stream",
+                                                        @"publish_stream",
+                                                        @"offline_access",
+                                                        @"email",
+                                                        @"user_photos",
+                                                        @"user_events",
+                                                        @"user_checkins",
+                                                        nil]
+                                              delegate:self];
+     */
+    //You can use another Facebook Developer Key different the KRFacebook.h define your default developer key.
     //facebook = [[KRFacebook alloc] initWithDevKey:@"Your Developer Key of Facebook App" delegate:self];
     
 }
@@ -60,9 +75,31 @@
                                 miniMessage:@"Nothing else."];
 }
 
+-(IBAction)uploadImage:(id)sender
+{
+    //Take a look ~
+    //Method 1
+    [self.facebook uploadWithImage:[UIImage imageNamed:@"sample.png"] description:@"Uploaded from an Image"];
+    //Method 2
+    [self.facebook uploadWithPhotoPath:@"/var/mobile/krfacebook/sample.png" description:@"Uploaded from a local file path"];
+    //Method 3
+    [self.facebook uploadWithPhotoURL:[NSURL URLWithString:@"http://sample.com/sampe1.jpg"] description:@"Uploaded from URL"];
+}
+
 -(IBAction)login:(id)sender
 {
+    //Use default permissions to Login.
     [self.facebook login];
+    /*
+    //Dynamic using custom permissions to Login.
+    [self.facebook loginWithPermissions:[NSArray arrayWithObjects:
+                                         @"read_stream",
+                                         @"publish_stream",
+                                         @"offline_access",
+                                         @"email",
+                                         @"user_photos",
+                                         nil]];
+     */
 }
 
 -(IBAction)logout:(id)sender
@@ -96,9 +133,17 @@
     NSLog(@"krFacebookDidFinishAllRequests");
 }
 
--(void)krFacebook:(KRFacebook *)_krFacebook didSavedUserPrivations:(NSDictionary *)_savedDatas
+-(void)krFacebook:(KRFacebook *)_krFacebook didSavedUserPrivateInfo:(NSDictionary *)_userInfo
 {
-    NSLog(@"datas : %@", _savedDatas);
+    NSLog(@"_userInfo : %@", _userInfo);
+}
+
+/*
+ * @ Here is your requests received the Facebook's Response Values.
+ */
+-(void)krFacebookDidLoadWithResponses:(id)_results
+{
+    NSLog(@"_results : %@", _results);
 }
 
 

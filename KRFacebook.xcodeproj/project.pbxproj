@@ -346,7 +346,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer: KUO-MING LIN (LJ8A4ND325)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: KUO-MING LIN (LJ8A4ND325)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -357,6 +357,7 @@
 				INFOPLIST_FILE = "KRFacebook/KRFacebook-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "8051EFBE-A79E-44D4-894B-6AD271EF39E6";
 				SDKROOT = iphoneos;
 				WRAPPER_EXTENSION = app;
 			};
@@ -366,7 +367,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer: KUO-MING LIN (LJ8A4ND325)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: KUO-MING LIN (LJ8A4ND325)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -377,6 +378,7 @@
 				INFOPLIST_FILE = "KRFacebook/KRFacebook-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "8051EFBE-A79E-44D4-894B-6AD271EF39E6";
 				SDKROOT = iphoneos;
 				WRAPPER_EXTENSION = app;
 			};
