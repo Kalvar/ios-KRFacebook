@@ -109,6 +109,11 @@ It need to setup the Facebook Developer Key for FACEBOOK_DEVELOPER_KEY in KRFace
     [self.facebook awakeSession];
 }
 
+-(IBAction)getPrivateUserInfo:(id)sender
+{
+    //Email, Profile Picture, Profile Name
+    [self.facebook getPrivateUserInfo];
+}
 #pragma KRFacebookDelegate
 -(void)krFacebookDidLogin
 {

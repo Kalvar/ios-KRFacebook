@@ -535,9 +535,9 @@
     self.requestAction = KRFacebookRequestPublishToFeeds;
     //REST API
     __block FBRequest *_fbRequest = [[FBRequest alloc] initWithSession:self.fbSession
-                                                    restMethod:@"stream.publish"
-                                                    parameters:params
-                                                    HTTPMethod:@"POST"];
+                                                            restMethod:@"stream.publish"
+                                                            parameters:params
+                                                            HTTPMethod:@"POST"];
     [_fbRequest startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
         [self _requestDidLoadResult:result];
     }];
@@ -1099,9 +1099,25 @@
     return [self _getSavedPersonalInfo];
 }
 
+-(void)getPrivateUserInfo
+{
+    __block FBRequest *_fbRequest = [[FBRequest alloc] initWithSession:self.fbSession graphPath:@"me?fields=picture,email,name"];
+    [_fbRequest startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
+        if( !error )
+        {
+            [self _requestDidLoadResult:result];
+        }
+        else
+        {
+            [self _requestDidFailWithError:error];
+        }
+        
+    }];
+}
+
 #pragma FacebookDelegate
 /*
- * @ 成功登入 
+ * @ 成功登入
  *   - 因為 Login 會需要取得一些個人資訊，所以會再觸發 request:didLoad: ( 同時觸發 krFacebookDidFinishAllRequests ) 的委派
  */
 -(void)fbDidLogin

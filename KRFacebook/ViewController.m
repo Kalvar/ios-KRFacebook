@@ -36,7 +36,7 @@
      */
     //You can use another Facebook Developer Key different the KRFacebook.h define your default developer key.
     //facebook = [[KRFacebook alloc] initWithDevKey:@"Your Developer Key of Facebook App" delegate:self];
-    
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs://"]]; 
 }
 
 -(void)viewDidAppear:(BOOL)animated{
@@ -110,6 +110,12 @@
 -(IBAction)awakeSession:(id)sender
 {
     [self.facebook awakeSession];
+}
+
+-(IBAction)getPrivateUserInfo:(id)sender
+{
+    //Email, Profile Picture, Profile Name
+    [self.facebook getPrivateUserInfo];
 }
 
 #pragma KRFacebookDelegate

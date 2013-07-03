@@ -280,6 +280,7 @@ typedef enum _KRFacebookRequests
 -(void)clearDelegates;
 
 -(NSString *)getSavedAccessToken;
+-(void)getPrivateUserInfo;
 
 @end
 
