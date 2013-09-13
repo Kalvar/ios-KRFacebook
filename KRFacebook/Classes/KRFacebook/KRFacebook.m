@@ -559,9 +559,9 @@
     self.requestStatus  = @"post.feeds.media"; 
     self.requestAction = KRFacebookRequestPublishToMedia;
     __block FBRequest *_fbRequest = [[FBRequest alloc] initWithSession:self.fbSession
-                                                    restMethod:@"stream.publish"
-                                                    parameters:params
-                                                    HTTPMethod:@"POST"];
+                                                            restMethod:@"stream.publish"
+                                                            parameters:params
+                                                            HTTPMethod:@"POST"];
     [_fbRequest startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
         [self _requestDidLoadResult:result];
     }];

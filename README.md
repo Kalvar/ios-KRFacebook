@@ -29,6 +29,8 @@ It need to setup the Facebook Developer Key for FACEBOOK_DEVELOPER_KEY in KRFace
     [super viewDidLoad];
     //Default using method.
     facebook = [[KRFacebook alloc] initWithDelegate:self];
+    //Use this method to wake up facebook session.
+    [self.facebook awakeSession];
     /*
     //Customize the facebook permissions if you want, and the permissions will be the default standard request.
     facebook = [[KRFacebook alloc] initWithPermissions:[NSArray arrayWithObjects:
