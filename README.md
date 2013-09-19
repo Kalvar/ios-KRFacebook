@@ -6,8 +6,6 @@ KRFacebook supports FacebookSDK 3.6, that you can easy share Youtube video, shar
 
 It need to go to *-info.plist set the facebook app developer key up with following the Facebook rules.
 
-<img src="https://dl.dropbox.com/u/83663874/GitHubs/KRFacebook-2.png" alt="KRFacebook.h" title="KRFacebook.h" style="margin: 20px;" class="center" />
-&nbsp;
 <img src="https://dl.dropbox.com/u/83663874/GitHubs/KRFacebook-1.png" alt=" *-info.plist" title=" *-info.plist" style="margin: 20px;" class="center" />
 
 ``` objective-c
