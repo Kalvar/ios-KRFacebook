@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8E261B6017EAFCDE00501D76 /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E261B5F17EAFCDE00501D76 /* FacebookSDK.framework */; };
+		8E261B6317EAFD6F00501D76 /* KRFacebook.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E261B6217EAFD6F00501D76 /* KRFacebook.m */; };
+		8E261B6617EB012200501D76 /* KRFacebookTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E261B6517EB012200501D76 /* KRFacebookTools.m */; };
+		8E261B7017EB151000501D76 /* FBSBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E261B6917EB151000501D76 /* FBSBJSON.m */; };
+		8E261B7117EB151000501D76 /* FBSBJsonBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E261B6B17EB151000501D76 /* FBSBJsonBase.m */; };
+		8E261B7217EB151000501D76 /* FBSBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E261B6D17EB151000501D76 /* FBSBJsonParser.m */; };
+		8E261B7317EB151000501D76 /* FBSBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E261B6F17EB151000501D76 /* FBSBJsonWriter.m */; };
 		8EB59C5E162B1B250065252E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EB59C5D162B1B250065252E /* UIKit.framework */; };
 		8EB59C60162B1B250065252E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EB59C5F162B1B250065252E /* Foundation.framework */; };
 		8EB59C62162B1B250065252E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EB59C61162B1B250065252E /* CoreGraphics.framework */; };
@@ -22,15 +29,22 @@
 		8EB59C83162B1B630065252E /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EB59C82162B1B630065252E /* Accounts.framework */; };
 		8EB59C85162B1B6D0065252E /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EB59C84162B1B6D0065252E /* Social.framework */; };
 		8EB59C87162B1B720065252E /* libsqlite3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EB59C86162B1B720065252E /* libsqlite3.0.dylib */; };
-		8EF96D0D175F73C90064CA49 /* FBSBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EF96CAA175F73C80064CA49 /* FBSBJSON.m */; settings = {COMPILER_FLAGS = ""; }; };
-		8EF96D0E175F73C90064CA49 /* FBSBJsonBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EF96CAC175F73C80064CA49 /* FBSBJsonBase.m */; settings = {COMPILER_FLAGS = ""; }; };
-		8EF96D0F175F73C90064CA49 /* FBSBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EF96CAE175F73C80064CA49 /* FBSBJsonParser.m */; settings = {COMPILER_FLAGS = ""; }; };
-		8EF96D10175F73C90064CA49 /* FBSBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EF96CB0175F73C80064CA49 /* FBSBJsonWriter.m */; settings = {COMPILER_FLAGS = ""; }; };
-		8EF96D11175F73C90064CA49 /* KRFacebook.m in Sources */ = {isa = PBXBuildFile; fileRef = 8EF96CB2175F73C80064CA49 /* KRFacebook.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		8EF96D36175F75970064CA49 /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EF96D35175F75970064CA49 /* FacebookSDK.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8E261B5F17EAFCDE00501D76 /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FacebookSDK.framework; sourceTree = "<group>"; };
+		8E261B6117EAFD6F00501D76 /* KRFacebook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRFacebook.h; sourceTree = "<group>"; };
+		8E261B6217EAFD6F00501D76 /* KRFacebook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRFacebook.m; sourceTree = "<group>"; };
+		8E261B6417EB012200501D76 /* KRFacebookTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRFacebookTools.h; sourceTree = "<group>"; };
+		8E261B6517EB012200501D76 /* KRFacebookTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRFacebookTools.m; sourceTree = "<group>"; };
+		8E261B6817EB151000501D76 /* FBSBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBSBJSON.h; sourceTree = "<group>"; };
+		8E261B6917EB151000501D76 /* FBSBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBSBJSON.m; sourceTree = "<group>"; };
+		8E261B6A17EB151000501D76 /* FBSBJsonBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBSBJsonBase.h; sourceTree = "<group>"; };
+		8E261B6B17EB151000501D76 /* FBSBJsonBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBSBJsonBase.m; sourceTree = "<group>"; };
+		8E261B6C17EB151000501D76 /* FBSBJsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBSBJsonParser.h; sourceTree = "<group>"; };
+		8E261B6D17EB151000501D76 /* FBSBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBSBJsonParser.m; sourceTree = "<group>"; };
+		8E261B6E17EB151000501D76 /* FBSBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBSBJsonWriter.h; sourceTree = "<group>"; };
+		8E261B6F17EB151000501D76 /* FBSBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBSBJsonWriter.m; sourceTree = "<group>"; };
 		8EB59C59162B1B250065252E /* KRFacebook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KRFacebook.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8EB59C5D162B1B250065252E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		8EB59C5F162B1B250065252E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -51,17 +65,6 @@
 		8EB59C82162B1B630065252E /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
 		8EB59C84162B1B6D0065252E /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		8EB59C86162B1B720065252E /* libsqlite3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.0.dylib; path = usr/lib/libsqlite3.0.dylib; sourceTree = SDKROOT; };
-		8EF96CA9175F73C80064CA49 /* FBSBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBSBJSON.h; sourceTree = "<group>"; };
-		8EF96CAA175F73C80064CA49 /* FBSBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBSBJSON.m; sourceTree = "<group>"; };
-		8EF96CAB175F73C80064CA49 /* FBSBJsonBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBSBJsonBase.h; sourceTree = "<group>"; };
-		8EF96CAC175F73C80064CA49 /* FBSBJsonBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBSBJsonBase.m; sourceTree = "<group>"; };
-		8EF96CAD175F73C80064CA49 /* FBSBJsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBSBJsonParser.h; sourceTree = "<group>"; };
-		8EF96CAE175F73C80064CA49 /* FBSBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBSBJsonParser.m; sourceTree = "<group>"; };
-		8EF96CAF175F73C80064CA49 /* FBSBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBSBJsonWriter.h; sourceTree = "<group>"; };
-		8EF96CB0175F73C80064CA49 /* FBSBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBSBJsonWriter.m; sourceTree = "<group>"; };
-		8EF96CB1175F73C80064CA49 /* KRFacebook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KRFacebook.h; sourceTree = "<group>"; };
-		8EF96CB2175F73C80064CA49 /* KRFacebook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KRFacebook.m; sourceTree = "<group>"; };
-		8EF96D35175F75970064CA49 /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FacebookSDK.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,13 +79,28 @@
 				8EB59C5E162B1B250065252E /* UIKit.framework in Frameworks */,
 				8EB59C60162B1B250065252E /* Foundation.framework in Frameworks */,
 				8EB59C62162B1B250065252E /* CoreGraphics.framework in Frameworks */,
-				8EF96D36175F75970064CA49 /* FacebookSDK.framework in Frameworks */,
+				8E261B6017EAFCDE00501D76 /* FacebookSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8E261B6717EB151000501D76 /* FBJSON */ = {
+			isa = PBXGroup;
+			children = (
+				8E261B6817EB151000501D76 /* FBSBJSON.h */,
+				8E261B6917EB151000501D76 /* FBSBJSON.m */,
+				8E261B6A17EB151000501D76 /* FBSBJsonBase.h */,
+				8E261B6B17EB151000501D76 /* FBSBJsonBase.m */,
+				8E261B6C17EB151000501D76 /* FBSBJsonParser.h */,
+				8E261B6D17EB151000501D76 /* FBSBJsonParser.m */,
+				8E261B6E17EB151000501D76 /* FBSBJsonWriter.h */,
+				8E261B6F17EB151000501D76 /* FBSBJsonWriter.m */,
+			);
+			path = FBJSON;
+			sourceTree = "<group>";
+		};
 		8EB59C4E162B1B250065252E = {
 			isa = PBXGroup;
 			children = (
@@ -153,9 +171,11 @@
 		8ED930F0162BB87100522EDC /* KRFacebook */ = {
 			isa = PBXGroup;
 			children = (
-				8EF96CA8175F73C80064CA49 /* JSON */,
-				8EF96CB1175F73C80064CA49 /* KRFacebook.h */,
-				8EF96CB2175F73C80064CA49 /* KRFacebook.m */,
+				8E261B6717EB151000501D76 /* FBJSON */,
+				8E261B6117EAFD6F00501D76 /* KRFacebook.h */,
+				8E261B6217EAFD6F00501D76 /* KRFacebook.m */,
+				8E261B6417EB012200501D76 /* KRFacebookTools.h */,
+				8E261B6517EB012200501D76 /* KRFacebookTools.m */,
 			);
 			path = KRFacebook;
 			sourceTree = "<group>";
@@ -171,27 +191,12 @@
 		8EF96CA2175F73560064CA49 /* Facebook */ = {
 			isa = PBXGroup;
 			children = (
-				8EF96D35175F75970064CA49 /* FacebookSDK.framework */,
+				8E261B5F17EAFCDE00501D76 /* FacebookSDK.framework */,
 				8EB59C82162B1B630065252E /* Accounts.framework */,
 				8EB59C80162B1B5C0065252E /* AdSupport.framework */,
 				8EB59C84162B1B6D0065252E /* Social.framework */,
 			);
 			name = Facebook;
-			sourceTree = "<group>";
-		};
-		8EF96CA8175F73C80064CA49 /* JSON */ = {
-			isa = PBXGroup;
-			children = (
-				8EF96CA9175F73C80064CA49 /* FBSBJSON.h */,
-				8EF96CAA175F73C80064CA49 /* FBSBJSON.m */,
-				8EF96CAB175F73C80064CA49 /* FBSBJsonBase.h */,
-				8EF96CAC175F73C80064CA49 /* FBSBJsonBase.m */,
-				8EF96CAD175F73C80064CA49 /* FBSBJsonParser.h */,
-				8EF96CAE175F73C80064CA49 /* FBSBJsonParser.m */,
-				8EF96CAF175F73C80064CA49 /* FBSBJsonWriter.h */,
-				8EF96CB0175F73C80064CA49 /* FBSBJsonWriter.m */,
-			);
-			path = JSON;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -263,11 +268,12 @@
 				8EB59C6A162B1B250065252E /* main.m in Sources */,
 				8EB59C6E162B1B250065252E /* AppDelegate.m in Sources */,
 				8EB59C77162B1B250065252E /* ViewController.m in Sources */,
-				8EF96D0D175F73C90064CA49 /* FBSBJSON.m in Sources */,
-				8EF96D0E175F73C90064CA49 /* FBSBJsonBase.m in Sources */,
-				8EF96D0F175F73C90064CA49 /* FBSBJsonParser.m in Sources */,
-				8EF96D10175F73C90064CA49 /* FBSBJsonWriter.m in Sources */,
-				8EF96D11175F73C90064CA49 /* KRFacebook.m in Sources */,
+				8E261B6317EAFD6F00501D76 /* KRFacebook.m in Sources */,
+				8E261B6617EB012200501D76 /* KRFacebookTools.m in Sources */,
+				8E261B7017EB151000501D76 /* FBSBJSON.m in Sources */,
+				8E261B7117EB151000501D76 /* FBSBJsonBase.m in Sources */,
+				8E261B7217EB151000501D76 /* FBSBJsonParser.m in Sources */,
+				8E261B7317EB151000501D76 /* FBSBJsonWriter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

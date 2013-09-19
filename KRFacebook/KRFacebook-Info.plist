@@ -35,13 +35,13 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>FacebookAppID</key>
-	<string>Your Facebook App Developer Key</string>
+	<string>Your Facebook App ID</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>fb + Your Facebook App Developer Key</string>
+				<string>fb+Your Facebook App ID</string>
 			</array>
 		</dict>
 	</array>

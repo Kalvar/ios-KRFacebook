@@ -7,11 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "KRFacebook.h"
 
 @class KRFacebook;
 
-@interface ViewController : UIViewController<KRFacebookDelegate>
+@interface ViewController : UIViewController
+{
+    
+}
 
 @property (nonatomic, strong) KRFacebook *facebook;
 

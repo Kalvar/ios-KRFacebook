@@ -32,7 +32,7 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
+    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 }
 
@@ -41,10 +41,13 @@
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
 }
 
-#pragma Facebook SDK 3.1.1 處理流程
+#pragma FacebookSDK 3.6+
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
 {
-    return [self.session handleOpenURL:url];
+    //return [self.session handleOpenURL:url];
+    return [FBAppCall handleOpenURL:url
+                  sourceApplication:sourceApplication
+                        withSession:self.session];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
@@ -54,7 +57,8 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    [FBSession.activeSession handleDidBecomeActive];
+    //[FBSession.activeSession handleDidBecomeActive];
+    [FBAppCall handleDidBecomeActiveWithSession:self.session];
 }
 
 @end
