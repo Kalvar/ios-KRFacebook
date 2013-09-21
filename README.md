@@ -20,7 +20,7 @@ It need to go to *-info.plist set the facebook app developer key up with followi
 
 @implementation ViewController
 
-@synthesize facebook;
+@synthesize facebook = _facebook;
 
 - (void)viewDidLoad
 {
