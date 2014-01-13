@@ -2,6 +2,8 @@
 
 KRFacebook supports FacebookSDK 3.6, that you can easy share Youtube video, share your video file, upload a photo, upload several photos, upload your video, request GraphAPI, and easy write the message on the news feed wall.
 
+And you can easy fetch the user's info ( Facebook responses raw data, user id, user name, user email, user gender, access token. )
+
 ## How To Get Started
 
 It need to go to *-info.plist set the facebook app developer key up with following the Facebook rules.
@@ -214,14 +216,18 @@ It need to go to *-info.plist set the facebook app developer key up with followi
 -(IBAction)getPrivateUserInfo:(id)sender
 {
     //Me Info, Email, Profile Picture, Profile Name
-    NSDictionary *_userInfo = [_facebook getUserInfo];
+    NSDictionary *_userInfo = _facebook.userInfo;
+    NSString *_userId       = _facebook.userId;
+    NSString *_userEmail    = _facebook.userEmail;
+    NSString *_userName     = _facebook.userName;
+    NSString *_userGender   = _facebook.userGender;
     NSLog(@"_userInfo : %@", _userInfo);
 }
 ```
 
 ## Version
 
-KRFacebook now is V2.0.
+KRFacebook now is V2.1.
 
 ## License
 

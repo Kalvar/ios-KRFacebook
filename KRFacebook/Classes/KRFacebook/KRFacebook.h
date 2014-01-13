@@ -1,9 +1,9 @@
 //
 //  KRFacebook.h
-//  V2.0
+//  V2.1
 //
 //  Created by Kuo-Ming Lin ( Kalvar ; ilovekalvar@gmail.com ) on 2013/01/20.
-//  Copyright (c) 2012 - 2013年 Kuo-Ming Lin. All rights reserved.
+//  Copyright (c) 2012 - 2014年 Kuo-Ming Lin. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -23,6 +23,11 @@ typedef void (^KRFacebookErrorHandler)(NSError *error);
 @property (nonatomic, strong) FBSession *fbSession;
 @property (nonatomic, strong) NSString *accessToken;
 @property (nonatomic, strong) NSArray *permissions;
+@property (nonatomic, strong) NSDictionary *userInfo;
+@property (nonatomic, strong) NSString *userId;
+@property (nonatomic, strong) NSString *userEmail;
+@property (nonatomic, strong) NSString *userName;
+@property (nonatomic, strong) NSString *userGender;
 
 
 +(KRFacebook *)sharedManager;
@@ -35,11 +40,6 @@ typedef void (^KRFacebookErrorHandler)(NSError *error);
 -(void)awakeFBSession;
 -(BOOL)isFBSessionOpen;
 -(FBSession *)getActiveFBSession;
--(NSDictionary *)getUserInfo;
--(NSString *)getUserId;
--(NSString *)getEmail;
--(NSString *)getName;
--(NSString *)getAccessToken;
 
 #pragma --mark Getters
 -(NSString *)accessToken;

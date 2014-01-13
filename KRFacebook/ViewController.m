@@ -220,7 +220,11 @@
 -(IBAction)getPrivateUserInfo:(id)sender
 {
     //Me Info, Email, Profile Picture, Profile Name
-    NSDictionary *_userInfo = [_facebook getUserInfo];
+    NSDictionary *_userInfo = _facebook.userInfo;
+    NSString *_userId       = _facebook.userId;
+    NSString *_userEmail    = _facebook.userEmail;
+    NSString *_userName     = _facebook.userName;
+    NSString *_userGender   = _facebook.userGender;
     NSLog(@"_userInfo : %@", _userInfo);
 }
 

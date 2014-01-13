@@ -1,9 +1,9 @@
 //
 //  KRFacebook.m
-//  KRFacebook
+//  V2.1
 //
 //  Created by Kalvar on 13/9/19.
-//  Copyright (c) 2013年 Kuo-Ming Lin. All rights reserved.
+//  Copyright (c) 2012 - 2014年 Kuo-Ming Lin. All rights reserved.
 //
 
 #import "KRFacebook.h"
@@ -15,6 +15,7 @@ static NSString *_kKRFacebookUserInfoKey     = @"_kKRFacebookUserInfoKey";
 static NSString *_kKRFacebookUserIdKey       = @"_kKRFacebookUserIdKey";
 static NSString *_kKRFacebookEmailKey        = @"_kKRFacebookEmailKey";
 static NSString *_kKRFacebookNameKey         = @"_kKRFacebookNameKey";
+static NSString *_kKRFacebookGenderKey       = @"_kKRFacebookGenderKey";
 static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
 
 @interface KRFacebook ()
@@ -36,6 +37,7 @@ static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
                          //@"user_photos",
                          //@"user_events",
                          //@"user_checkins",
+                         @"user_birthday",
                          @"read_stream",
                          @"email",
                          @"publish_stream"];
@@ -53,53 +55,63 @@ static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
     return [KRFacebookTools getAppDelegate].session;
 }
 
--(NSDictionary *)_getSavedFacebookUserInfo
+-(NSDictionary *)_getUserInfo
 {
     return [KRFacebookTools getDefaultValueForKey:_kKRFacebookUserInfoKey];
 }
 
--(NSString *)_getSavedFacebookUserId
+-(NSString *)_getUserId
 {
     return [KRFacebookTools getDefaultStringValueForKey:_kKRFacebookUserIdKey];
 }
 
--(NSString *)_getSavedFacebookName
+-(NSString *)_getName
 {
     return [KRFacebookTools getDefaultStringValueForKey:_kKRFacebookNameKey];
 }
 
--(NSString *)_getSavedFacebookEmail
+-(NSString *)_getEmail
 {
     return [KRFacebookTools getDefaultStringValueForKey:_kKRFacebookEmailKey];
 }
 
--(NSString *)_getSavedFacebookAccessToken
+-(NSString *)_getGender
+{
+    return [KRFacebookTools getDefaultStringValueForKey:_kKRFacebookGenderKey];
+}
+
+-(NSString *)_getAccessToken
 {
     return [KRFacebookTools getDefaultStringValueForKey:_kKRFacebookAccessTokenKey];
 }
 
 #pragma --mark Setters
--(void)_saveFacebookUserInfo:(NSDictionary *)_facebookUserInfo
+-(void)_saveUserInfo:(NSDictionary *)_facebookUserInfo
 {
     [KRFacebookTools setDefaultValue:_facebookUserInfo forKey:_kKRFacebookUserInfoKey];
 }
 
--(void)_saveFacebookUserId:(NSString *)_facebookId
+-(void)_saveUserId:(NSString *)_facebookId
 {
     [KRFacebookTools setDefaultStringValue:_facebookId forKey:_kKRFacebookUserIdKey];
 }
 
--(void)_saveFacebookEmail:(NSString *)_facebookEmail
+-(void)_saveEmail:(NSString *)_facebookEmail
 {
     [KRFacebookTools setDefaultStringValue:_facebookEmail forKey:_kKRFacebookEmailKey];
 }
 
--(void)_saveFacebookName:(NSString *)_facebookName
+-(void)_saveName:(NSString *)_facebookName
 {
     [KRFacebookTools setDefaultStringValue:_facebookName forKey:_kKRFacebookNameKey];
 }
 
--(void)_saveFacebookAccessToken:(NSString *)_facebookAccessToken
+-(void)_saveGender:(NSString *)_facebookGender
+{
+    [KRFacebookTools setDefaultStringValue:_facebookGender forKey:_kKRFacebookGenderKey];
+}
+
+-(void)_saveAccessToken:(NSString *)_facebookAccessToken
 {
     [KRFacebookTools setDefaultStringValue:_facebookAccessToken forKey:_kKRFacebookAccessTokenKey];
 }
@@ -135,7 +147,7 @@ static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
                                                      NSError *error)
      {
          //檢查是否未存有 Facebook User ID
-         NSString *_savedUserId = [self _getSavedFacebookUserId];
+         NSString *_savedUserId = [self _getUserId];
          if( [_savedUserId length] < 1 || [_savedUserId isEqualToString:@"(null)"] || !_savedUserId )
          {
              //取出使用者的 facebook id 存起來備用
@@ -154,11 +166,12 @@ static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
                           NSString *_accessToken = session.accessTokenData.accessToken;
                           [_userInfo setObject:_accessToken forKey:@"access_token"];
                           self.accessToken = _accessToken;
-                          [self _saveFacebookUserInfo:_userInfo];
-                          [self _saveFacebookUserId:[_userInfo objectForKey:@"id"]];
-                          [self _saveFacebookEmail:[_userInfo objectForKey:@"email"]];
-                          [self _saveFacebookName:[_userInfo objectForKey:@"name"]];
-                          [self _saveFacebookAccessToken:_accessToken];
+                          [self _saveUserInfo:_userInfo];
+                          [self _saveUserId:[_userInfo objectForKey:@"id"]];
+                          [self _saveEmail:[_userInfo objectForKey:@"email"]];
+                          [self _saveName:[_userInfo objectForKey:@"name"]];
+                          [self _saveGender:[_userInfo objectForKey:@"gender"]];
+                          [self _saveAccessToken:_accessToken];
                       }
                   }
                   if( _completion )
@@ -172,7 +185,7 @@ static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
              //有 User Id 就直接更新
              if( _completion )
              {
-                 _completion( !( error ), [self _getSavedFacebookUserInfo] );
+                 _completion( !( error ), [self _getUserInfo] );
              }
          }
      }];
@@ -184,6 +197,7 @@ static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
     [KRFacebookTools removeDefaultValueForKey:_kKRFacebookUserIdKey];
     [KRFacebookTools removeDefaultValueForKey:_kKRFacebookEmailKey];
     [KRFacebookTools removeDefaultValueForKey:_kKRFacebookNameKey];
+    [KRFacebookTools removeDefaultValueForKey:_kKRFacebookGenderKey];
     [KRFacebookTools removeDefaultValueForKey:_kKRFacebookAccessTokenKey];
     [[KRFacebookTools getAppDelegate].session closeAndClearTokenInformation];
 }
@@ -551,34 +565,6 @@ static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
     return [self _getActiveFBSession];
 }
 
-/*
- * @ 取得儲存的 Facebook 資料
- */
--(NSDictionary *)getUserInfo
-{
-    return [self _getSavedFacebookUserInfo];
-}
-
--(NSString *)getUserId
-{
-    return [self _getSavedFacebookUserId];
-}
-
--(NSString *)getEmail
-{
-    return [self _getSavedFacebookEmail];
-}
-
--(NSString *)getName
-{
-    return [self _getSavedFacebookName];
-}
-
--(NSString *)getAccessToken
-{
-    return [self _getSavedFacebookAccessToken];
-}
-
 #pragma --mark Getters
 -(NSString *)accessToken
 {
@@ -589,6 +575,7 @@ static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
         _token = _fbSession.accessTokenData.accessToken;
     }
     return _token;
+    //return [self _getAccessToken];
 }
 
 -(FBSession *)fbSession
@@ -598,6 +585,34 @@ static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
         _fbSession = [self getActiveFBSession];
     }
     return _fbSession;
+}
+
+/*
+ * @ 取得儲存的 Facebook 資料
+ */
+-(NSDictionary *)userInfo
+{
+    return [self _getUserInfo];
+}
+
+-(NSString *)userId
+{
+    return [self _getUserId];
+}
+
+-(NSString *)userEmail
+{
+    return [self _getEmail];
+}
+
+-(NSString *)userName
+{
+    return [self _getName];
+}
+
+-(NSString *)userGender
+{
+    return [self _getGender];
 }
 
 #pragma --mark Publishing News Feed (發佈各式留言)
