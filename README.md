@@ -1,6 +1,6 @@
 ## Supports
 
-KRFacebook supports FacebookSDK 3.6, that you can easy share Youtube video, share your video file, upload a photo, upload several photos, upload your video, request GraphAPI, and easy write the message on the news feed wall.
+KRFacebook supports FacebookSDK 3.6 and under versions that you can easier share Youtube video and your video file, upload a photo, upload several photos, upload your video, request GraphAPI, and easy writing the message on the news feed wall.
 
 And you can easy fetch the user's info ( Facebook responses raw data, user id, user name, user email, user gender, access token. )
 
@@ -40,6 +40,62 @@ It need to go to *-info.plist set the facebook app developer key up with followi
 }
 
 #pragma IBActions
+-(IBAction)uploadPhotoToAlbum:(id)sender
+{
+    /*
+     * @ Reference
+     *   - About albums
+     *     - https://developers.facebook.com/docs/graph-api/reference/v2.0/album
+     *
+     *   - About upload photo to album
+     *     - https://developers.facebook.com/docs/graph-api/reference/v2.0/album/photos
+     *
+     *   - Permission is user_photos
+     *
+     * @ Notice
+     *   - You have to wait for the console appears logs when you pressed the " Upload url photo to album " button to start in uploading.
+     */
+    //To get your all of albums and please don't forget the permission of ' user_photos '.
+    NSString *_getAlbumsGraphPath = @"me?fields=albums";
+    [_facebook requestGraphApiPath:_getAlbumsGraphPath completionHandler:^(BOOL finished, id result) {
+        if( finished )
+        {
+            NSLog(@"#1 GraphAPI result : %@", result);
+            //To upload a photo from URL link in your particular album.
+            if( [result isKindOfClass:[NSDictionary class]] )
+            {
+                NSDictionary *_albums = [(NSDictionary *)result objectForKey:@"albums"];
+                if( [[_albums objectForKey:@"data"] count] > 0 )
+                {
+                    //To enumerate all albums.
+                    NSArray *_allAlbums = [_albums objectForKey:@"data"];
+                    for( NSDictionary *_eachAlbums in _allAlbums )
+                    {
+                        NSLog(@"#2 Each album info : %@", _eachAlbums);
+                    }
+                    
+                    //In this case that I wanna pick my No. 3 album to upload my photo.
+                    NSString *_albumId                = [[_allAlbums objectAtIndex:2] objectForKey:@"id"];
+                    NSString *_uploadToAlbumGraphPath = [NSString stringWithFormat:@"%@/photos", _albumId];
+                    NSDictionary *_parameters         = @{@"url"    : @"Your photo url link.",
+                                                          //If you wanna upload local image file that you can use imageNamed or imageWithContentsOfFile to fetch it to convert NSData use for uploading.
+                                                          //@"source" : UIImagePNGRepresentation([UIImage imageNamed:@"sample.png"]),
+                                                          //As below is photo comments.
+                                                          @"message" : @"The photo comments."
+                                                          };
+                    [_facebook requestGraphApiPath:_uploadToAlbumGraphPath parameters:_parameters httpMethod:KRFacebookHttpMethodPost completionHandler:^(BOOL finished, id result) {
+                        if( finished )
+                        {
+                            NSLog(@"#3 Uploaded results : %@", result);
+                        }
+                    }];
+                    
+                }
+            }
+        }
+    }];
+}
+
 -(IBAction)callGraphAPI:(id)sender
 {
     NSString *_graphApiPath = @"me?fields=home.with(facebook).limit(10)";
@@ -227,7 +283,7 @@ It need to go to *-info.plist set the facebook app developer key up with followi
 
 ## Version
 
-KRFacebook now is V2.1.
+KRFacebook now is V2.2.
 
 ## License
 

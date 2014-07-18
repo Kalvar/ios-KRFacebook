@@ -1,6 +1,6 @@
 //
 //  KRFacebook.m
-//  V2.1
+//  V2.2
 //
 //  Created by Kalvar on 13/9/19.
 //  Copyright (c) 2012 - 2014年 Kuo-Ming Lin. All rights reserved.
@@ -205,6 +205,21 @@ static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
 -(BOOL)_sessionIsOpen
 {
     return [KRFacebookTools getAppDelegate].session.isOpen;
+}
+
+-(NSString *)_convertHttpMethod:(KRFacebookHttpMethods)_httpMethod
+{
+    NSString *_httpMethodString = @"GET";
+    switch (_httpMethod)
+    {
+        case KRFacebookHttpMethodPost:
+            _httpMethodString = @"POST";
+            break;
+        case KRFacebookHttpMethodGet:
+        default:
+            break;
+    }
+    return _httpMethodString;
 }
 
 @end
@@ -507,7 +522,7 @@ static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
     static KRFacebook *_object = nil;
     dispatch_once(&pred, ^{
         _object = [[KRFacebook alloc] init];
-        [_object _initWithVars];
+        //[_object _initWithVars];
     });
     return _object;
 }
@@ -1030,7 +1045,24 @@ static NSString *_kKRFacebookAccessTokenKey  = @"_kKRFacebookAccessTokenKey";
                  _completionHandler( !(error), result );
              }
          }];
-        
+    }
+}
+
+-(void)requestGraphApiPath:(NSString *)_graphPath parameters:(NSDictionary *)_parameters httpMethod:(KRFacebookHttpMethods)_httpMethod completionHandler:(KRFacebookCompletionHandler)_completionHandler
+{
+    if( self.fbSession )
+    {
+        FBRequest *_fbRequest = [[FBRequest alloc] initWithSession:_fbSession
+                                                         graphPath:_graphPath
+                                                        parameters:_parameters
+                                                        HTTPMethod:[self _convertHttpMethod:_httpMethod]];
+        [_fbRequest startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error)
+        {
+            if( _completionHandler )
+            {
+                _completionHandler( !(error), result );
+            }
+        }];
     }
 }
 

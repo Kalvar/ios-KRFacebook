@@ -1,6 +1,6 @@
 //
 //  KRFacebook.h
-//  V2.1
+//  V2.2
 //
 //  Created by Kuo-Ming Lin ( Kalvar ; ilovekalvar@gmail.com ) on 2013/01/20.
 //  Copyright (c) 2012 - 2014年 Kuo-Ming Lin. All rights reserved.
@@ -11,6 +11,12 @@
 
 typedef void (^KRFacebookCompletionHandler)(BOOL finished, id result);
 typedef void (^KRFacebookErrorHandler)(NSError *error);
+
+typedef enum _KRFacebookHttpMethods
+{
+    KRFacebookHttpMethodGet = 0,
+    KRFacebookHttpMethodPost
+}KRFacebookHttpMethods;
 
 @interface KRFacebook : NSObject
 {
@@ -125,5 +131,7 @@ typedef void (^KRFacebookErrorHandler)(NSError *error);
 
 #pragma --mark GraphAPI Calls
 -(void)requestGraphApiPath:(NSString *)_graphPath completionHandler:(KRFacebookCompletionHandler)_completionHandler;
+-(void)requestGraphApiPath:(NSString *)_graphPath parameters:(NSDictionary *)_parameters httpMethod:(KRFacebookHttpMethods)_httpMethod completionHandler:(KRFacebookCompletionHandler)_completionHandler;
+
 
 @end
